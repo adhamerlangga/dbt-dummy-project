@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: March 15, 2026 at 6:59 PM
+> Last updated: March 15, 2026 at 7:06 PM
 
-## Overall: 23/82 tasks (28%)
+## Overall: 24/82 tasks (29%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -26,8 +26,8 @@
 - [x] Run `dbt run` and see table created
 - [x] Check compiled SQL in target folder
 
-### E-commerce Analytics Pipeline — 9/27 (33%)
-`███░░░░░░░`
+### E-commerce Analytics Pipeline — 10/27 (37%)
+`████░░░░░░`
 
 **Data Acquisition**
 - [x] Download sample e-commerce dataset (Kaggle)
@@ -41,7 +41,7 @@
 - [x] Build stg_products.sql
 - [x] Build stg_order_items.sql
 - [x] Run `dbt run --select staging.*`
-- [ ] Check generated tables in DuckDB
+- [x] Check generated tables in DuckDB
 
 **Sources & Tests**
 - [ ] Create `models/staging/sources.yml`
