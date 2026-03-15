@@ -1,0 +1,141 @@
+# dbt Learning Roadmap — Progress Snapshot
+> Last updated: March 15, 2026 at 5:01 AM
+
+## Overall: 19/82 tasks (23%)
+
+### Setup & Foundation — 14/14 (100%)
+`██████████`
+
+**Environment Setup**
+- [x] Install Python
+- [x] Install dbt-duckdb: `pip install dbt-duckdb`
+- [x] Initialize project: `dbt init my_first_project`
+- [x] Understand project folder structure
+- [x] Run `dbt debug` to verify
+
+**Quick Theory Skim**
+- [x] Read "What is dbt?" on dbt docs
+- [x] Understand: models, sources, tests, materializations
+- [x] Learn what `ref()` and `source()` do
+- [x] Understand DAG (Directed Acyclic Graph)
+
+**First Working Model**
+- [x] Create a simple seed file (CSV)
+- [x] Run `dbt seed`
+- [x] Write your first model (simple SELECT)
+- [x] Run `dbt run` and see table created
+- [x] Check compiled SQL in target folder
+
+### E-commerce Analytics Pipeline — 5/27 (19%)
+`██░░░░░░░░`
+
+**Data Acquisition**
+- [x] Download sample e-commerce dataset (Kaggle)
+- [x] Place CSV files in `seeds/` folder
+- [x] Run `dbt seed`
+
+**Staging Layer**
+- [x] Create `models/staging/` folder
+- [x] Build stg_customers.sql
+- [ ] Build stg_orders.sql
+- [ ] Build stg_products.sql
+- [ ] Build stg_order_items.sql
+- [ ] Run `dbt run --select staging.*`
+- [ ] Check generated tables in DuckDB
+
+**Sources & Tests**
+- [ ] Create `models/staging/sources.yml`
+- [ ] Define raw data sources
+- [ ] Replace with `source()` function
+- [ ] Add schema tests (unique, not_null, relationships)
+- [ ] Run `dbt test` and fix failures
+
+**Mart Layer**
+- [ ] Create `models/marts/` folder
+- [ ] Build fct_orders.sql
+- [ ] Build dim_customers.sql
+- [ ] Build dim_products.sql
+- [ ] Run `dbt run --select marts.*`
+
+**Analytics Layer**
+- [ ] Build customer_lifetime_value.sql
+- [ ] Build monthly_revenue.sql
+- [ ] Build product_performance.sql
+- [ ] Build cohort_analysis.sql (optional)
+
+**Documentation**
+- [ ] Add descriptions to models in schema.yml
+- [ ] Run `dbt docs generate` + `dbt docs serve`
+- [ ] Document at least 3 key models
+
+### Personal Finance Tracker — 0/12 (0%)
+`░░░░░░░░░░`
+
+**Setup**
+- [ ] Create new dbt project or add folder
+- [ ] Find/create personal finance CSV dataset
+- [ ] Load transaction data as seeds
+
+**Build Pipeline**
+- [ ] Staging: clean transaction data (dates, categories, amounts)
+- [ ] Marts: monthly spending summaries
+- [ ] Marts: budget tracking (planned vs actual)
+- [ ] Analytics: YoY spending comparisons
+- [ ] Analytics: category trends over time
+
+**Advanced Features**
+- [ ] Custom macro for categorization logic
+- [ ] Data quality tests (no future dates, amount ranges)
+- [ ] Try incremental materialization
+- [ ] Custom singular tests (budget thresholds)
+
+### Public Data Analysis — 0/11 (0%)
+`░░░░░░░░░░`
+
+**Setup & Build**
+- [ ] Pick dataset: GitHub Archive / Stack Overflow / COVID / weather
+- [ ] Download and load into DuckDB
+- [ ] Staging layer for data cleanup
+- [ ] Identify 3–5 interesting questions
+- [ ] Build models to answer each question
+- [ ] Create final "dashboard" model
+
+**Advanced Concepts**
+- [ ] Use dbt packages (dbt_utils)
+- [ ] Implement incremental models
+- [ ] Create custom tests
+- [ ] Build reusable macros
+- [ ] Use variables in dbt_project.yml
+
+### Leveling Up — 0/13 (0%)
+`░░░░░░░░░░`
+
+**Deep Dives**
+- [ ] Snapshots (slowly changing dimensions)
+- [ ] Hooks (pre-hook, post-hook)
+- [ ] Exposures (dbt → BI tools)
+- [ ] Packages & community macros
+- [ ] Orchestration concepts (dbt Cloud / Airflow)
+
+**Best Practices**
+- [ ] Set up version control (git)
+- [ ] Naming convention for models
+- [ ] Folder structure (staging/intermediate/marts/analytics)
+- [ ] Tests for all critical models
+- [ ] Document business logic
+
+**TIL Doc**
+- [ ] Start markdown TIL file
+- [ ] Add working code snippets
+- [ ] Note "gotchas" and solutions
+
+### Bonus Challenges — 0/5 (0%)
+`░░░░░░░░░░`
+
+**Challenges**
+- [ ] Rebuild project using Jinja
+- [ ] Create custom materialization
+- [ ] CI/CD with GitHub Actions
+- [ ] Connect dbt to BI tool (Metabase/Superset)
+- [ ] Write a blog post about learnings
+
