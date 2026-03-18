@@ -10,7 +10,8 @@ with source as (
         product_height_cm, 
         product_width_cm
     from 
-        {{ ref('olist_products_dataset') }}
+        -- {{ ref('olist_products_dataset') }}
+        {{ source('ecommerce_raw', 'olist_products_dataset') }}
 )
 
 select

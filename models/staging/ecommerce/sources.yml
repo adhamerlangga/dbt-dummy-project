@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: ecommerce_raw
+    description: "Raw Brazilian e-commerce data from Olist (Kaggle dataset)"
+    database: dev
+    schema: main
+    tables:
+    - name: olist_customers_dataset
+      description: Customer information including location data
+      
+    - name: olist_orders_dataset
+      description: Order header information with timestamps and status
+      
+    - name: olist_order_items_dataset
+      description: Line items for each order with pricing
+      
+    - name: olist_products_dataset
+      description: Product catalog with dimensions and categories

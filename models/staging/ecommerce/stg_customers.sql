@@ -6,7 +6,8 @@ with source as (
         customer_city, 
         customer_state
     from 
-        {{ ref('olist_customers_dataset') }}
+        -- {{ ref('olist_customers_dataset') }}
+        {{ source('ecommerce_raw', 'olist_customers_dataset') }}
 )
 
 select 

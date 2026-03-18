@@ -9,7 +9,8 @@ with source as (
         order_delivered_customer_date, 
         order_estimated_delivery_date
     from 
-        {{ ref('olist_orders_dataset') }}
+        -- {{ ref('olist_orders_dataset') }}
+        {{ source('ecommerce_raw', 'olist_orders_dataset') }}
 )
 
 select

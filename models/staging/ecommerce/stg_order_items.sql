@@ -8,7 +8,8 @@ with source as (
         price, 
         freight_value
     from 
-        {{ ref('olist_order_items_dataset') }}
+        -- {{ ref('olist_order_items_dataset') }}
+        {{ source('ecommerce_raw', 'olist_order_items_dataset') }}
 )
 
 select
