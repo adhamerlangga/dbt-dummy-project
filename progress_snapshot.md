@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: March 19, 2026 at 3:44 AM
+> Last updated: March 24, 2026 at 5:03 PM
 
-## Overall: 27/82 tasks (33%)
+## Overall: 29/82 tasks (35%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -26,8 +26,8 @@
 - [x] Run `dbt run` and see table created
 - [x] Check compiled SQL in target folder
 
-### E-commerce Analytics Pipeline — 13/27 (48%)
-`█████░░░░░`
+### E-commerce Analytics Pipeline — 15/27 (56%)
+`██████░░░░`
 
 **Data Acquisition**
 - [x] Download sample e-commerce dataset (Kaggle)
@@ -47,8 +47,8 @@
 - [x] Create `models/staging/sources.yml`
 - [x] Define raw data sources
 - [x] Replace with `source()` function
-- [ ] Add schema tests (unique, not_null, relationships)
-- [ ] Run `dbt test` and fix failures
+- [x] Add schema tests (unique, not_null, relationships)
+- [x] Run `dbt test` and fix failures
 
 **Mart Layer**
 - [ ] Create `models/marts/` folder

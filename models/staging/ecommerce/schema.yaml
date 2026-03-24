@@ -1,0 +1,144 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned and renamed customer data from the raw dataset"
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer"
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_unique_id
+        description: "Unique identifier for each customer (alternative)"
+        tests:
+          - not_null
+      
+      - name: customer_zip_code_prefix
+        description: "Zip code prefix for the customer's location"
+      
+      - name: customer_city
+        description: "City where the customer is located"
+      
+      - name: customer_state  
+        description: "State where the customer is located"
+        tests:
+          - not_null
+  
+  - name: stg_orders
+    description: "Cleaned order header data from Olist raw source"
+    columns:
+      - name: order_id
+        description: "Primary key. Unique identifier for each order."
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: "Foreign key to stg_customers. Links order to a customer."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+
+      - name: order_status
+        description: "Current status of the order"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['delivered', 'shipped', 'canceled', 'unavailable', 'invoiced', 'processing', 'created', 'approved']
+
+      - name: order_purchased_at
+        description: "Timestamp when the order was placed"
+        tests:
+          - not_null
+
+      - name: order_approved_at
+        description: "Timestamp when payment was approved"
+
+      - name: order_delivered_carrier_at
+        description: "Timestamp when order was handed to carrier"
+
+      - name: order_delivered_customer_at
+        description: "Timestamp when order was delivered to customer"
+
+      - name: order_estimated_delivery_at
+        description: "Estimated delivery date at time of purchase"
+  
+  - name: stg_order_items
+    description: "Cleaned line item data. Grain is one row per order_id + order_item_id."
+    columns:
+      - name: order_id
+        description: "Foreign key to stg_orders. Not unique — one order can have multiple items."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+      - name: order_item_id
+        description: "Sequential item number within an order. Starts at 1."
+        tests:
+          - not_null
+
+      - name: product_id
+        description: "Foreign key to stg_products."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+      - name: seller_id
+        description: "Identifier for the seller fulfilling this item."
+        tests:
+          - not_null
+
+      - name: price
+        description: "Item price in BRL"
+        tests:
+          - not_null
+
+      - name: freight_value
+        description: "Freight cost for this item in BRL"
+        tests:
+          - not_null
+  
+  - name: stg_products
+    description: "Cleaned product catalog from Olist raw source."
+    columns:
+      - name: product_id
+        description: "Primary key. Unique identifier for each product."
+        tests:
+          - unique
+          - not_null
+
+      - name: product_category_name
+        description: "Portuguese category name. Nullable — some products have no category."
+
+      - name: product_name_length
+        description: "Character count of product name."
+
+      - name: product_description_length
+        description: "Character count of product description."
+
+      - name: product_photos_qty
+        description: "Number of photos for the product listing."
+
+      - name: product_weight_g
+        description: "Product weight in grams."
+
+      - name: product_length_cm
+        description: "Product length in centimeters."
+
+      - name: product_height_cm
+        description: "Product height in centimeters."
+
+      - name: product_width_cm
+        description: "Product width in centimeters."
