@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: March 27, 2026 at 3:52 PM
+> Last updated: March 27, 2026 at 7:13 PM
 
-## Overall: 30/82 tasks (37%)
+## Overall: 31/82 tasks (38%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -26,7 +26,7 @@
 - [x] Run `dbt run` and see table created
 - [x] Check compiled SQL in target folder
 
-### E-commerce Analytics Pipeline — 16/27 (59%)
+### E-commerce Analytics Pipeline — 17/27 (63%)
 `██████░░░░`
 
 **Data Acquisition**
@@ -52,7 +52,7 @@
 
 **Mart Layer**
 - [x] Create `models/marts/` folder
-- [ ] Build fct_orders.sql
+- [x] Build fct_orders.sql
 - [ ] Build dim_customers.sql
 - [ ] Build dim_products.sql
 - [ ] Run `dbt run --select marts.*`
