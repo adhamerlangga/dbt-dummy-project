@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: fact_orders
+    description: "Fact table containing order-level metrics and dimensions for analysis"
+    tests:
+      - unique:
+          arguments:
+            column_name: order_id ||'-'|| order_item_id
+    columns:
+
+      - name: order_item_id
+        description: "Unique identifier for each order item."
+        tests:
+          - not_null
+
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - not_null
+
+      - name: customer_id
+        description: "Foreign key to stg_customers. Links order to a customer."
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+
+      - name: price
+        description: "Total price of the order"
+        tests:
+          - not_null
+
+      - name: freight_value
+        description: "Freight cost for the order"
+        tests:
+          - not_null
