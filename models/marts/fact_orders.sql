@@ -30,7 +30,7 @@ products as (
         product_id,
         product_category_name
     from
-        {{ ref('stg_products') }}
+        {{ ref('dim_products') }}
 )
 
 select 
