@@ -37,3 +37,17 @@ models:
         description: "Freight cost for the order"
         tests:
           - not_null
+
+  - name: monthly_revenue
+    description: "Monthly revenue aggregated from delivered orders"
+    columns:
+      - name: revenue_month
+        description: "First day of the month for the reporting period"
+        tests:
+          - unique
+          - not_null
+
+      - name: total_revenue
+        description: "Sum of total item revenue for delivered orders"
+        tests:
+          - not_null
