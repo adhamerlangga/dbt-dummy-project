@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: March 28, 2026 at 10:46 AM
+> Last updated: March 30, 2026 at 9:34 AM
 
-## Overall: 34/82 tasks (41%)
+## Overall: 35/82 tasks (43%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -26,8 +26,8 @@
 - [x] Run `dbt run` and see table created
 - [x] Check compiled SQL in target folder
 
-### E-commerce Analytics Pipeline — 20/27 (74%)
-`███████░░░`
+### E-commerce Analytics Pipeline — 21/27 (78%)
+`████████░░`
 
 **Data Acquisition**
 - [x] Download sample e-commerce dataset (Kaggle)
@@ -59,7 +59,7 @@
 
 **Analytics Layer**
 - [ ] Build customer_lifetime_value.sql
-- [ ] Build monthly_revenue.sql
+- [x] Build monthly_revenue.sql
 - [ ] Build product_performance.sql
 - [ ] Build cohort_analysis.sql (optional)
 
