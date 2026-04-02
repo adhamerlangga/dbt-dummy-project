@@ -51,3 +51,12 @@ models:
         description: "Sum of total item revenue for delivered orders"
         tests:
           - not_null
+  
+  - name: product_performance
+    description: "Performance metrics for products based on delivered orders"
+    columns:
+      - name: product_category_name
+        description: "Category of the product"
+        tests:
+          - unique
+          - not_null
