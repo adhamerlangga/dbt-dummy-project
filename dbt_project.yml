@@ -24,3 +24,5 @@ models:
     marts:
       +materialized: table
       +schema: marts
+      analytics:
+        +schema: marts
