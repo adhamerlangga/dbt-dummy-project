@@ -26,3 +26,11 @@ models:
       +schema: marts
       analytics:
         +schema: marts
+
+seeds:
+  my_first_project:
+    ecommerce_brazillian_olist:
+      +schema: raw_ecommerce
+    
+    personal_finance:
+      +schema: raw_personal_finance
