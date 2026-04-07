@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 5, 2026 at 10:16 AM
+> Last updated: April 7, 2026 at 8:40 AM
 
-## Overall: 41/82 tasks (50%)
+## Overall: 43/82 tasks (52%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -68,12 +68,12 @@
 - [x] Run `dbt docs generate` + `dbt docs serve`
 - [x] Document at least 3 key models
 
-### Personal Finance Tracker — 0/12 (0%)
-`░░░░░░░░░░`
+### Personal Finance Tracker — 2/12 (17%)
+`██░░░░░░░░`
 
 **Setup**
-- [ ] Create new dbt project or add folder
-- [ ] Find/create personal finance CSV dataset
+- [x] Create new dbt project or add folder
+- [x] Find/create personal finance CSV dataset
 - [ ] Load transaction data as seeds
 
 **Build Pipeline**

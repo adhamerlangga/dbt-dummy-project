@@ -4,5 +4,5 @@ logs/
 *.duckdb
 .user.yml
 profiles.yml
-seeds/
 dbt_internal_packages/
+seeds/personal_finance/personal_finance.csv
