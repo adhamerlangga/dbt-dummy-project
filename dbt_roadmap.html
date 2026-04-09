@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dbt Roadmap Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --accent: #ff6b35;
+    --accent2: #f7c59f;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
+
+  /* Header */
+  .header { margin-bottom: 32px; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .header h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.1; background: linear-gradient(135deg, #fff 0%, var(--accent2) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .header-sub { color: var(--muted); font-size: 13px; margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Export bar */
+  .export-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .export-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; flex: 1; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { border-color: var(--accent); color: var(--accent); background: rgba(255,107,53,0.08); }
+  .btn.primary:hover { background: rgba(255,107,53,0.15); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Overall progress */
+  .overall-progress {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .overall-progress::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--purple), var(--blue)); }
+  .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px; }
+  .progress-label { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+  .progress-count { font-size: 32px; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; line-height: 1; }
+  .progress-count span { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .progress-bar-wrap { background: var(--surface2); border-radius: 100px; height: 8px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--yellow)); border-radius: 100px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .phase-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .phase-pill { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 4px 10px; border-radius: 100px; border: 1px solid; display: flex; align-items: center; gap: 5px; }
+
+  /* Phase */
+  .phase { margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: border-color 0.2s; }
+  .phase:hover { border-color: rgba(255,107,53,0.2); }
+  .phase-header { padding: 18px 22px; cursor: pointer; display: flex; align-items: center; gap: 14px; user-select: none; transition: background 0.2s; }
+  .phase-header:hover { background: var(--surface2); }
+  .phase-num { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .phase-info { flex: 1; }
+  .phase-title { font-weight: 700; font-size: 14px; }
+  .phase-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .phase-meta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .phase-pct { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 17px; }
+  .phase-tasks { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-align: right; }
+  .phase-toggle { color: var(--muted); font-size: 16px; transition: transform 0.3s; }
+  .phase.collapsed .phase-toggle { transform: rotate(-90deg); }
+  .phase-bar { height: 2px; background: var(--surface2); }
+  .phase-bar-fill { height: 100%; transition: width 0.4s ease; }
+  .phase-body { padding: 6px 0 14px; }
+  .phase.collapsed .phase-body { display: none; }
+
+  .section-title { font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); padding: 10px 22px 5px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .task { display: flex; align-items: flex-start; gap: 12px; padding: 6px 22px; cursor: pointer; transition: background 0.15s; }
+  .task:hover { background: var(--surface2); }
+  .task-check { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .task.done .task-check { border-color: var(--green); background: var(--green); }
+  .task.done .task-check::after { content: '✓'; color: #0d0f14; font-size: 10px; font-weight: 900; line-height: 1; }
+  .task-text { font-size: 13px; line-height: 1.5; color: var(--text); transition: color 0.2s; }
+  .task.done .task-text { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(100,116,139,0.5); }
+  .task-text code { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--surface2); padding: 1px 5px; border-radius: 4px; color: var(--accent2); border: 1px solid var(--border); }
+
+  /* Notes */
+  .notes-section { margin-top: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; position: relative; overflow: hidden; }
+  .notes-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--purple), var(--blue)); }
+  .notes-title { font-size: 11px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
+  .notes-area { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: var(--text); font-size: 13px; font-family: 'JetBrains Mono', monospace; resize: vertical; min-height: 90px; width: 100%; outline: none; transition: border-color 0.2s; }
+  .notes-area:focus { border-color: var(--accent); }
+
+  .footer { margin-top: 24px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .motivational { text-align: center; margin-top: 24px; font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .motivational span { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-tag">// learning path</div>
+    <h1>dbt deep dive learning</h1>
+    <div class="header-sub">tick boxes here → export JSON → commit → Let Claude know the progress</div>
+  </div>
+
+  <!-- Export bar -->
+  <div class="export-bar">
+    <div class="export-label">💾 Save progress for Claude</div>
+    <button class="btn" onclick="exportJSON()">⬇ export progress.json</button>
+    <button class="btn primary" onclick="exportMarkdown()">⬇ export progress_snapshot.md</button>
+    <button class="btn" onclick="importJSON()">⬆ import progress.json</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+  </div>
+
+  <div class="overall-progress">
+    <div class="progress-header">
+      <div><div class="progress-label">Overall Progress</div></div>
+      <div class="progress-count" id="overall-pct">0<span>%</span></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="overall-bar" style="width:0%"></div></div>
+    <div class="phase-pills" id="phase-pills"></div>
+  </div>
+
+  <div id="phases-container"></div>
+
+  <div class="notes-section">
+    <div class="notes-title">// progress notes & learnings</div>
+    <textarea class="notes-area" id="notes-area" placeholder="...&#10;&#10;Tips: export progress_snapshot.md after update this, commit to repo, Claude in the your Project will automatically know!"></textarea>
+  </div>
+
+  <div class="footer">
+    <button class="btn" onclick="expandAll()">▼ expand all</button>
+    <button class="btn" onclick="collapseAll()">▲ collapse all</button>
+    <button class="btn" onclick="resetAll()">↺ reset</button>
+  </div>
+  <div class="motivational">commit after update → Claude will know the latest progress <span>→</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const phases = [
+  {
+    id: 'phase1', title: 'Setup & Foundation', subtitle: 'Day 1–2', color: '#ff6b35',
+    sections: [
+      { title: 'Environment Setup', tasks: [
+        { id: 'p1_1', text: 'Install Python', done: true },
+        { id: 'p1_2', text: 'Install dbt-duckdb: <code>pip install dbt-duckdb</code>', done: true },
+        { id: 'p1_3', text: 'Initialize project: <code>dbt init my_first_project</code>', done: true },
+        { id: 'p1_4', text: 'Understand project folder structure', done: true },
+        { id: 'p1_5', text: 'Run <code>dbt debug</code> to verify', done: true },
+      ]},
+      { title: 'Quick Theory Skim', tasks: [
+        { id: 'p1_6', text: 'Read "What is dbt?" on dbt docs', done: true },
+        { id: 'p1_7', text: 'Understand: models, sources, tests, materializations', done: true },
+        { id: 'p1_8', text: 'Learn what <code>ref()</code> and <code>source()</code> do', done: true },
+        { id: 'p1_9', text: 'Understand DAG (Directed Acyclic Graph)', done: true },
+      ]},
+      { title: 'First Working Model', tasks: [
+        { id: 'p1_10', text: 'Create a simple seed file (CSV)', done: true },
+        { id: 'p1_11', text: 'Run <code>dbt seed</code>', done: true },
+        { id: 'p1_12', text: 'Write your first model (simple SELECT)', done: true },
+        { id: 'p1_13', text: 'Run <code>dbt run</code> and see table created', done: true },
+        { id: 'p1_14', text: 'Check compiled SQL in target folder', done: true },
+      ]}
+    ]
+  },
+  {
+    id: 'phase2', title: 'E-commerce Analytics Pipeline', subtitle: 'Week 1–2 · Project 1', color: '#60a5fa',
+    sections: [
+      { title: 'Data Acquisition', tasks: [
+        { id: 'p2_1', text: 'Download sample e-commerce dataset (Kaggle)', done: true },
+        { id: 'p2_2', text: 'Place CSV files in <code>seeds/</code> folder', done: true },
+        { id: 'p2_3', text: 'Run <code>dbt seed</code>', done: true },
+      ]},
+      { title: 'Staging Layer', tasks: [
+        { id: 'p2_4', text: 'Create <code>models/staging/</code> folder', done: true },
+        { id: 'p2_5', text: 'Build stg_customers.sql', done: true },
+        { id: 'p2_6', text: 'Build stg_orders.sql', done: false },
+        { id: 'p2_7', text: 'Build stg_products.sql', done: false },
+        { id: 'p2_8', text: 'Build stg_order_items.sql', done: false },
+        { id: 'p2_9', text: 'Run <code>dbt run --select staging.*</code>', done: false },
+        { id: 'p2_10', text: 'Check generated tables in DuckDB', done: false },
+      ]},
+      { title: 'Sources & Tests', tasks: [
+        { id: 'p2_11', text: 'Create <code>models/staging/sources.yml</code>', done: false },
+        { id: 'p2_12', text: 'Define raw data sources', done: false },
+        { id: 'p2_13', text: 'Replace with <code>source()</code> function', done: false },
+        { id: 'p2_14', text: 'Add schema tests (unique, not_null, relationships)', done: false },
+        { id: 'p2_15', text: 'Run <code>dbt test</code> and fix failures', done: false },
+      ]},
+      { title: 'Mart Layer', tasks: [
+        { id: 'p2_16', text: 'Create <code>models/marts/</code> folder', done: false },
+        { id: 'p2_17', text: 'Build fct_orders.sql', done: false },
+        { id: 'p2_18', text: 'Build dim_customers.sql', done: false },
+        { id: 'p2_19', text: 'Build dim_products.sql', done: false },
+        { id: 'p2_20', text: 'Run <code>dbt run --select marts.*</code>', done: false },
+      ]},
+      { title: 'Analytics Layer', tasks: [
+        { id: 'p2_21', text: 'Build customer_lifetime_value.sql', done: false },
+        { id: 'p2_22', text: 'Build monthly_revenue.sql', done: false },
+        { id: 'p2_23', text: 'Build product_performance.sql', done: false },
+        { id: 'p2_24', text: 'Build cohort_analysis.sql (optional)', done: false },
+      ]},
+      { title: 'Documentation', tasks: [
+        { id: 'p2_25', text: 'Add descriptions to models in schema.yml', done: false },
+        { id: 'p2_26', text: 'Run <code>dbt docs generate</code> + <code>dbt docs serve</code>', done: false },
+        { id: 'p2_27', text: 'Document at least 3 key models', done: false },
+      ]}
+    ]
+  },
+  {
+    id: 'phase3', title: 'Personal Finance Tracker', subtitle: 'Week 2–3 · Project 2', color: '#a78bfa',
+    sections: [
+      { title: 'Setup', tasks: [
+        { id: 'p3_1', text: 'Create new dbt project or add folder', done: false },
+        { id: 'p3_2', text: 'Find/create personal finance CSV dataset', done: false },
+        { id: 'p3_3', text: 'Load transaction data as seeds', done: false },
+      ]},
+      { title: 'Build Pipeline', tasks: [
+        { id: 'p3_4', text: 'Staging: clean transaction data (dates, categories, amounts)', done: false },
+        { id: 'p3_5', text: 'Marts: monthly spending summaries', done: false },
+        { id: 'p3_6', text: 'Marts: budget tracking (planned vs actual)', done: false },
+        { id: 'p3_7', text: 'Analytics: YoY spending comparisons', done: false },
+        { id: 'p3_8', text: 'Analytics: category trends over time', done: false },
+      ]},
+      { title: 'Advanced Features', tasks: [
+        { id: 'p3_9', text: 'Custom macro for categorization logic', done: false },
+        { id: 'p3_10', text: 'Data quality tests (no future dates, amount ranges)', done: false },
+        { id: 'p3_11', text: 'Try incremental materialization', done: false },
+        { id: 'p3_12', text: 'Custom singular tests (budget thresholds)', done: false },
+      ]}
+    ]
+  },
+  {
+    id: 'phase4', title: 'Public Data Analysis', subtitle: 'Week 3–4 · Project 3', color: '#4ade80',
+    sections: [
+      { title: 'Setup & Build', tasks: [
+        { id: 'p4_1', text: 'Pick dataset: GitHub Archive / Stack Overflow / COVID / weather', done: false },
+        { id: 'p4_2', text: 'Download and load into DuckDB', done: false },
+        { id: 'p4_3', text: 'Staging layer for data cleanup', done: false },
+        { id: 'p4_4', text: 'Identify 3–5 interesting questions', done: false },
+        { id: 'p4_5', text: 'Build models to answer each question', done: false },
+        { id: 'p4_6', text: 'Create final "dashboard" model', done: false },
+      ]},
+      { title: 'Advanced Concepts', tasks: [
+        { id: 'p4_7', text: 'Use dbt packages (dbt_utils)', done: false },
+        { id: 'p4_8', text: 'Implement incremental models', done: false },
+        { id: 'p4_9', text: 'Create custom tests', done: false },
+        { id: 'p4_10', text: 'Build reusable macros', done: false },
+        { id: 'p4_11', text: 'Use variables in dbt_project.yml', done: false },
+      ]}
+    ]
+  },
+  {
+    id: 'phase5', title: 'Leveling Up', subtitle: 'Ongoing', color: '#fbbf24',
+    sections: [
+      { title: 'Deep Dives', tasks: [
+        { id: 'p5_1', text: 'Snapshots (slowly changing dimensions)', done: false },
+        { id: 'p5_2', text: 'Hooks (pre-hook, post-hook)', done: false },
+        { id: 'p5_3', text: 'Exposures (dbt → BI tools)', done: false },
+        { id: 'p5_4', text: 'Packages & community macros', done: false },
+        { id: 'p5_5', text: 'Orchestration concepts (dbt Cloud / Airflow)', done: false },
+      ]},
+      { title: 'Best Practices', tasks: [
+        { id: 'p5_6', text: 'Set up version control (git)', done: false },
+        { id: 'p5_7', text: 'Naming convention for models', done: false },
+        { id: 'p5_8', text: 'Folder structure (staging/intermediate/marts/analytics)', done: false },
+        { id: 'p5_9', text: 'Tests for all critical models', done: false },
+        { id: 'p5_10', text: 'Document business logic', done: false },
+      ]},
+      { title: 'TIL Doc', tasks: [
+        { id: 'p5_11', text: 'Start markdown TIL file', done: false },
+        { id: 'p5_12', text: 'Add working code snippets', done: false },
+        { id: 'p5_13', text: 'Note "gotchas" and solutions', done: false },
+      ]}
+    ]
+  },
+  {
+    id: 'bonus', title: 'Bonus Challenges', subtitle: 'Extra credit', color: '#f472b6',
+    sections: [
+      { title: 'Challenges', tasks: [
+        { id: 'b1', text: 'Rebuild project using Jinja', done: false },
+        { id: 'b2', text: 'Create custom materialization', done: false },
+        { id: 'b3', text: 'CI/CD with GitHub Actions', done: false },
+        { id: 'b4', text: 'Connect dbt to BI tool (Metabase/Superset)', done: false },
+        { id: 'b5', text: 'Write a blog post about learnings', done: false },
+      ]}
+    ]
+  }
+];
+
+// ── State ──────────────────────────────────────────────────
+let state = {};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('dbt_state_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = parsed.tasks || {};
+      const notes = parsed.notes || '';
+      // defer notes load until DOM ready
+      setTimeout(() => {
+        const el = document.getElementById('notes-area');
+        if (el && notes) el.value = notes;
+      }, 0);
+    } else {
+      initState();
+    }
+  } catch(e) { initState(); }
+}
+
+function initState() {
+  state = {};
+  phases.forEach(ph => ph.sections.forEach(sec => sec.tasks.forEach(t => { state[t.id] = t.done; })));
+}
+
+function saveState() {
+  const notes = document.getElementById('notes-area')?.value || '';
+  try {
+    localStorage.setItem('dbt_state_v2', JSON.stringify({ tasks: state, notes, updatedAt: new Date().toISOString() }));
+  } catch(e) {}
+}
+
+// ── Export / Import ────────────────────────────────────────
+function exportJSON() {
+  const notes = document.getElementById('notes-area')?.value || '';
+  const data = {
+    _info: "dbt Learning Roadmap - Progress File",
+    _howto: "Commit this file to your repo. Claude in your Project will read this.",
+    updatedAt: new Date().toISOString(),
+    notes,
+    tasks: state
+  };
+  download('progress.json', JSON.stringify(data, null, 2));
+  toast('progress.json downloaded! Commit to your repo.');
+}
+
+function exportMarkdown() {
+  const notes = document.getElementById('notes-area')?.value || '';
+  const { total, done } = getAllTotals();
+  const pct = Math.round(done/total*100);
+  const now = new Date().toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
+
+  let md = `# dbt Learning Roadmap — Progress Snapshot\n`;
+  md += `> Last updated: ${now}\n\n`;
+  md += `## Overall: ${done}/${total} tasks (${pct}%)\n\n`;
+
+  phases.forEach(ph => {
+    const t = getTotals(ph);
+    const p = Math.round(t.done/t.total*100);
+    const bar = '█'.repeat(Math.round(p/10)) + '░'.repeat(10 - Math.round(p/10));
+    md += `### ${ph.title} — ${t.done}/${t.total} (${p}%)\n`;
+    md += `\`${bar}\`\n\n`;
+    ph.sections.forEach(sec => {
+      md += `**${sec.title}**\n`;
+      sec.tasks.forEach(task => {
+        const isDone = state[task.id];
+        const clean = task.text.replace(/<code>(.*?)<\/code>/g, '`$1`').replace(/<[^>]+>/g, '');
+        md += `- [${isDone ? 'x' : ' '}] ${clean}\n`;
+      });
+      md += '\n';
+    });
+  });
+
+  if (notes.trim()) {
+    md += `---\n## Notes\n${notes}\n`;
+  }
+
+  download('progress_snapshot.md', md);
+  toast('progress_snapshot.md downloaded! Commit to your repo.');
+}
+
+function importJSON() {
+  document.getElementById('import-file').click();
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.tasks) {
+        state = data.tasks;
+        if (data.notes) document.getElementById('notes-area').value = data.notes;
+        saveState();
+        renderAll();
+        toast('Progress imported successfully!');
+      }
+    } catch(err) { alert('Invalid file.'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function download(filename, content) {
+  const a = document.createElement('a');
+  a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+  a.download = filename;
+  a.click();
+}
+
+// ── Utils ──────────────────────────────────────────────────
+function getTotals(phase) {
+  let total = 0, done = 0;
+  phase.sections.forEach(sec => sec.tasks.forEach(t => { total++; if (state[t.id]) done++; }));
+  return { total, done };
+}
+function getAllTotals() {
+  let total = 0, done = 0;
+  phases.forEach(ph => { const t = getTotals(ph); total += t.total; done += t.done; });
+  return { total, done };
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = '✓ ' + msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Update UI ──────────────────────────────────────────────
+function updateOverall() {
+  const { total, done } = getAllTotals();
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('overall-pct').innerHTML = pct + '<span>%</span>';
+  document.getElementById('overall-bar').style.width = pct + '%';
+  const pills = document.getElementById('phase-pills');
+  pills.innerHTML = '';
+  phases.forEach(ph => {
+    const t = getTotals(ph);
+    const p = t.total ? Math.round(t.done/t.total*100) : 0;
+    const pill = document.createElement('div');
+    pill.className = 'phase-pill';
+    pill.style.cssText = `border-color:${ph.color}40;color:${ph.color};background:${ph.color}10`;
+    pill.innerHTML = `<span style="width:5px;height:5px;border-radius:50%;background:${ph.color};display:inline-block"></span>${ph.title.split(' ')[0]}: ${p}%`;
+    pills.appendChild(pill);
+  });
+}
+
+function updatePhase(phaseId) {
+  const phase = phases.find(p => p.id === phaseId);
+  const { total, done } = getTotals(phase);
+  const pct = total ? Math.round(done/total*100) : 0;
+  const wrap = document.querySelector(`[data-phase="${phaseId}"]`);
+  if (!wrap) return;
+  wrap.querySelector('.phase-pct').textContent = pct + '%';
+  wrap.querySelector('.phase-bar-fill').style.width = pct + '%';
+  wrap.querySelector('.phase-tasks').textContent = `${done}/${total}`;
+}
+
+function toggleTask(taskId, phaseId) {
+  state[taskId] = !state[taskId];
+  const el = document.querySelector(`[data-task="${taskId}"]`);
+  if (el) el.classList.toggle('done', state[taskId]);
+  updatePhase(phaseId);
+  updateOverall();
+  saveState();
+}
+
+function togglePhase(phaseId) {
+  document.querySelector(`[data-phase="${phaseId}"]`)?.classList.toggle('collapsed');
+}
+function expandAll() { document.querySelectorAll('.phase.collapsed').forEach(el => el.classList.remove('collapsed')); }
+function collapseAll() { document.querySelectorAll('.phase:not(.collapsed)').forEach(el => el.classList.add('collapsed')); }
+function resetAll() {
+  if (!confirm('Reset all progress? This cannot be undone.')) return;
+  initState();
+  saveState();
+  renderAll();
+}
+
+// ── Render ─────────────────────────────────────────────────
+function renderAll() {
+  const container = document.getElementById('phases-container');
+  container.innerHTML = '';
+  phases.forEach((phase, idx) => {
+    const { total, done } = getTotals(phase);
+    const pct = total ? Math.round(done/total*100) : 0;
+    let sectionsHtml = '';
+    phase.sections.forEach(sec => {
+      let tasksHtml = sec.tasks.map(task => `
+        <div class="task ${state[task.id] ? 'done' : ''}" data-task="${task.id}" onclick="toggleTask('${task.id}','${phase.id}')">
+          <div class="task-check"></div>
+          <div class="task-text">${task.text}</div>
+        </div>`).join('');
+      sectionsHtml += `<div class="section"><div class="section-title">${sec.title}</div>${tasksHtml}</div>`;
+    });
+    const phaseEl = document.createElement('div');
+    phaseEl.className = `phase${idx >= 2 ? ' collapsed' : ''}`;
+    phaseEl.setAttribute('data-phase', phase.id);
+    phaseEl.innerHTML = `
+      <div class="phase-header" onclick="togglePhase('${phase.id}')">
+        <div class="phase-num" style="background:${phase.color}20;color:${phase.color}">P${idx+1}</div>
+        <div class="phase-info">
+          <div class="phase-title">${phase.title}</div>
+          <div class="phase-subtitle">${phase.subtitle}</div>
+        </div>
+        <div class="phase-meta">
+          <div>
+            <div class="phase-pct" style="color:${phase.color}">${pct}%</div>
+            <div class="phase-tasks">${done}/${total}</div>
+          </div>
+          <div class="phase-toggle">▾</div>
+        </div>
+      </div>
+      <div class="phase-bar"><div class="phase-bar-fill" style="width:${pct}%;background:${phase.color}"></div></div>
+      <div class="phase-body">${sectionsHtml}</div>`;
+    container.appendChild(phaseEl);
+  });
+  updateOverall();
+}
+
+// ── Init ───────────────────────────────────────────────────
+loadState();
+renderAll();
+document.getElementById('notes-area').addEventListener('input', saveState);
+</script>
+</body>
+</html>
