@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 13, 2026 at 12:33 PM
+> Last updated: April 13, 2026 at 2:04 PM
 
-## Overall: 46/82 tasks (56%)
+## Overall: 46/80 tasks (57%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -68,8 +68,8 @@
 - [x] Run `dbt docs generate` + `dbt docs serve`
 - [x] Document at least 3 key models
 
-### Personal Finance Tracker — 5/12 (42%)
-`████░░░░░░`
+### Personal Finance Tracker — 5/10 (50%)
+`█████░░░░░`
 
 **Setup**
 - [x] Create new dbt project or add folder
@@ -79,8 +79,6 @@
 **Build Pipeline**
 - [x] Staging: clean transaction data (dates, categories, amounts)
 - [x] Marts: monthly spending summaries
-- [ ] Marts: budget tracking (planned vs actual)
-- [ ] Analytics: YoY spending comparisons
 - [ ] Analytics: category trends over time
 
 **Advanced Features**
