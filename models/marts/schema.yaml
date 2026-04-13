@@ -114,3 +114,22 @@ models:
         description: "Average amount per transaction in the month"
         tests:
           - not_null
+  
+  - name: categories_spending_trend
+    description: "Trends in spending by category over time"
+    tests:
+      - unique:
+          arguments:
+            column_name: spending_month || '-' || category
+    columns:
+      - name: spending_month
+        description: "First day of the month for the reporting period"
+        tests:
+          - not_null
+      
+      - name: category
+        description: "Category of the spending"
+        tests:
+          - not_null
+      
+      
