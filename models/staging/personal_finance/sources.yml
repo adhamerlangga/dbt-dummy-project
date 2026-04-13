@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: personal_finance_raw
+    description: "Raw sample personal expense finance data from a CSV file (seed)"
+    database: dev
+    schema: raw_personal_finance
+    tables:
+    - name: personal_finance_sample
+      description: Sample personal finance data with columns for date, category, and amount
