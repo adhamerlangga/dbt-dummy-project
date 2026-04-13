@@ -85,13 +85,32 @@ models:
   
   - name: fact_monthly_spending
     description: "Fact table containing monthly spending metrics"
+    tests:
+      - unique:
+          arguments:
+            column_name: spending_month || '-' || category
     columns:
       - name: spending_month
         description: "First day of the month for the reporting period"
         tests:
           - not_null
+      
+      - name: category
+        description: "Category of the spending"
+        tests:
+          - not_null
 
       - name: total_spending
-        description: "Total spending by the customer in the month"
+        description: "Total spending in the month"
+        tests:
+          - not_null
+
+      - name: total_transactions
+        description: "Total number of transactions in the month"
+        tests:
+          - not_null
+      
+      - name: avg_transaction_amount
+        description: "Average amount per transaction in the month"
         tests:
           - not_null
