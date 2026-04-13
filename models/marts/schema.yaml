@@ -82,3 +82,16 @@ models:
         description: "Number of months since the customer's first order"
         tests:
           - not_null
+  
+  - name: fact_monthly_spending
+    description: "Fact table containing monthly spending metrics"
+    columns:
+      - name: spending_month
+        description: "First day of the month for the reporting period"
+        tests:
+          - not_null
+
+      - name: total_spending
+        description: "Total spending by the customer in the month"
+        tests:
+          - not_null
