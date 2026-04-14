@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 13, 2026 at 6:53 PM
+> Last updated: April 15, 2026 at 3:21 AM
 
-## Overall: 47/80 tasks (59%)
+## Overall: 48/80 tasks (60%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -68,8 +68,8 @@
 - [x] Run `dbt docs generate` + `dbt docs serve`
 - [x] Document at least 3 key models
 
-### Personal Finance Tracker — 6/10 (60%)
-`██████░░░░`
+### Personal Finance Tracker — 7/10 (70%)
+`███████░░░`
 
 **Setup**
 - [x] Create new dbt project or add folder
@@ -82,7 +82,7 @@
 - [x] Analytics: category trends over time
 
 **Advanced Features**
-- [ ] Custom macro for categorization logic
+- [x] Custom macro for categorization logic
 - [ ] Data quality tests (no future dates, amount ranges)
 - [ ] Try incremental materialization
 - [ ] Custom singular tests (budget thresholds)
