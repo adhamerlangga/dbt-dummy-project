@@ -16,6 +16,7 @@ select
     category,
     subcategory,
     merchant_name,
-    try_cast(amount as decimal(15,2)) as amount
+    try_cast(amount as decimal(15,2)) as amount,
+    {{ classify_spending(spending_type, category, subcategory) }} as spending_classification
 from 
     source

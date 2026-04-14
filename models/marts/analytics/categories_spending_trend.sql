@@ -1,7 +1,7 @@
 with monthly_spending as (
     select 
         spending_month,
-        category,
+        spending_classification,
         total_spending,
         total_transactions
     from 
@@ -11,17 +11,17 @@ with monthly_spending as (
 spending_with_lag as (
     select 
         spending_month,
-        category,
+        spending_classification,
         total_spending,
         total_transactions,
-        lag(total_spending) over (partition by category order by spending_month) as prev_month_spending
+        lag(total_spending) over (partition by spending_classification order by spending_month) as prev_month_spending
     from 
         monthly_spending
 )
 
 select 
     spending_month,
-    category,
+    spending_classification,
     total_spending,
     total_transactions,
     prev_month_spending,
@@ -36,4 +36,4 @@ select
 from 
     spending_with_lag
 order by 
-    category, spending_month
+    spending_classification, spending_month
