@@ -1,3 +1,9 @@
+{{ config(
+    materialized = 'incremental',
+    unique_key = ['spending_month', 'spending_classification'],
+    on_schema_change = 'fail'
+) }}
+
 with source as (
     select 
         transaction_date,
@@ -5,6 +11,10 @@ with source as (
         amount
     from 
         {{ ref('stg_expenses') }}
+    
+    {% if is_incremental() %} 
+        where transaction_date >= (select max(spending_month) from {{ this }})
+    {% endif %}
 )
 
 select 
