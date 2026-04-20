@@ -1,8 +1,14 @@
+# Ignore build artifacts and logs
 target/
-dbt_packages/
 logs/
 *.duckdb
+
+# Ignore dbt packages and internal packages
+dbt_packages/
 .user.yml
 profiles.yml
 dbt_internal_packages/
+
+# Ignore data files
 seeds/personal_finance/personal_finance.csv
+data/github_archive/
