@@ -1,0 +1,232 @@
+version: 2
+
+models:
+  - name: dim_repos
+    description: "Repository dimension at repo grain (one row per repo_id) with activity snapshots."
+    columns:
+      - name: repo_id
+        description: "Primary key. Stable repository identifier from GitHub events."
+        tests:
+          - not_null
+          - unique
+      - name: repo_name
+        description: "Latest observed repository name in owner/repo format."
+        tests:
+          - not_null
+      - name: repo_owner
+        description: "Owner/organization segment parsed from repo_name."
+      - name: repo_slug
+        description: "Repository segment parsed from repo_name."
+      - name: repo_url
+        description: "Latest observed GitHub API URL for the repository."
+      - name: first_event_timestamp_utc
+        description: "First observed event timestamp for this repo (UTC)."
+        tests:
+          - not_null
+      - name: last_event_timestamp_utc
+        description: "Last observed event timestamp for this repo (UTC)."
+        tests:
+          - not_null
+      - name: total_event_count
+        description: "Total number of events observed for the repository."
+      - name: push_event_count
+        description: "Count of PushEvent rows for the repository."
+      - name: pull_request_event_count
+        description: "Count of PullRequestEvent rows for the repository."
+      - name: pull_request_review_event_count
+        description: "Count of PullRequestReviewEvent rows for the repository."
+      - name: watch_event_count
+        description: "Count of WatchEvent rows for the repository."
+      - name: fork_event_count
+        description: "Count of ForkEvent rows for the repository."
+
+  - name: dim_actors
+    description: "Actor dimension at actor grain (one row per actor_id) with activity snapshots."
+    columns:
+      - name: actor_id
+        description: "Primary key. Stable actor identifier from GitHub events."
+        tests:
+          - not_null
+          - unique
+      - name: actor_login
+        description: "Latest observed GitHub login for the actor."
+        tests:
+          - not_null
+      - name: first_event_timestamp_utc
+        description: "First observed event timestamp for this actor (UTC)."
+        tests:
+          - not_null
+      - name: last_event_timestamp_utc
+        description: "Last observed event timestamp for this actor (UTC)."
+        tests:
+          - not_null
+      - name: total_event_count
+        description: "Total number of events performed by this actor."
+      - name: distinct_repos_touched
+        description: "Count of distinct repositories this actor has touched."
+      - name: push_event_count
+        description: "Count of PushEvent rows for the actor."
+      - name: pull_request_event_count
+        description: "Count of PullRequestEvent rows for the actor."
+      - name: pull_request_review_event_count
+        description: "Count of PullRequestReviewEvent rows for the actor."
+
+  - name: hourly_push_activity
+    description: "Push activity by UTC hour at repo granularity."
+    tests:
+      - unique:
+          arguments:
+            column_name: repo_id || '-' || cast(push_date as varchar) || '-' || cast(push_hour_utc as varchar)
+    columns:
+      - name: repo_id
+        description: "Repository identifier."
+        tests:
+          - not_null
+      - name: repo_name
+        description: "Repository name in owner/repo format."
+        tests:
+          - not_null
+      - name: push_date
+        description: "UTC calendar date of push activity."
+        tests:
+          - not_null
+      - name: push_hour_utc
+        description: "UTC hour bucket (0-23) for push activity."
+        tests:
+          - not_null
+      - name: push_hour_timestamp_utc
+        description: "UTC timestamp truncated to hour."
+        tests:
+          - not_null
+      - name: push_event_count
+        description: "Number of push events in the hour bucket."
+      - name: unique_push_actors
+        description: "Distinct actors who pushed in the hour bucket."
+      - name: pushed_commit_count
+        description: "Sum of payload.size from push events (commit count proxy)."
+
+  - name: repo_workflow_discipline
+    description: "Repository-level workflow signal comparing push volume to PR-open volume."
+    columns:
+      - name: repo_id
+        description: "Primary key. Repository identifier."
+        tests:
+          - not_null
+          - unique
+      - name: repo_name
+        description: "Repository name in owner/repo format."
+      - name: push_event_count
+        description: "Count of PushEvent rows for the repository."
+      - name: pr_opened_event_count
+        description: "Count of PullRequestEvent rows where payload.action is opened."
+      - name: push_pr_ratio
+        description: "Push events divided by PR opened events; null when pr_opened_event_count is zero."
+      - name: workflow_discipline_band
+        description: "Simple label for workflow posture: no_pr_activity, pr_heavy, balanced, or push_heavy."
+
+  - name: repo_growth_signals
+    description: "Repository-level watch/fork growth signals with ranking."
+    columns:
+      - name: repo_id
+        description: "Primary key. Repository identifier."
+        tests:
+          - not_null
+          - unique
+      - name: repo_name
+        description: "Repository name in owner/repo format."
+      - name: watch_event_count
+        description: "Count of watch events for the repository."
+      - name: fork_event_count
+        description: "Count of fork events for the repository."
+      - name: total_growth_signal_count
+        description: "Watch plus fork event count."
+      - name: first_watch_timestamp_utc
+        description: "First observed watch timestamp (UTC), when present."
+      - name: last_watch_timestamp_utc
+        description: "Last observed watch timestamp (UTC), when present."
+      - name: first_fork_timestamp_utc
+        description: "First observed fork timestamp (UTC), when present."
+      - name: last_fork_timestamp_utc
+        description: "Last observed fork timestamp (UTC), when present."
+      - name: watch_rank
+        description: "Dense rank by watch_event_count descending."
+      - name: fork_rank
+        description: "Dense rank by fork_event_count descending."
+      - name: growth_signal_rank
+        description: "Dense rank by total_growth_signal_count descending."
+
+  - name: pr_review_patterns
+    description: "PR review activity patterns by repo, UTC date/hour, and review state."
+    tests:
+      - unique:
+          arguments:
+            column_name: repo_id || '-' || cast(review_date as varchar) || '-' || cast(review_hour_utc as varchar) || '-' || review_state
+    columns:
+      - name: repo_id
+        description: "Repository identifier."
+        tests:
+          - not_null
+      - name: repo_name
+        description: "Repository name in owner/repo format."
+        tests:
+          - not_null
+      - name: review_date
+        description: "UTC calendar date of review activity."
+        tests:
+          - not_null
+      - name: review_hour_utc
+        description: "UTC hour bucket (0-23) for review activity."
+        tests:
+          - not_null
+      - name: review_hour_timestamp_utc
+        description: "UTC timestamp truncated to hour."
+        tests:
+          - not_null
+      - name: review_state
+        description: "Review state extracted from payload.review.state."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['approved', 'commented', 'changes_requested', 'dismissed', 'unknown']
+      - name: review_event_count
+        description: "Number of PullRequestReviewEvent rows in the bucket."
+      - name: unique_reviewers
+        description: "Distinct reviewers in the bucket."
+
+  - name: github_activity_summary
+    description: "Dashboard-ready repository summary across push, PR, review, and growth signals."
+    columns:
+      - name: repo_id
+        description: "Primary key. Repository identifier."
+        tests:
+          - not_null
+          - unique
+      - name: repo_name
+        description: "Repository name in owner/repo format."
+      - name: repo_owner
+        description: "Owner/organization segment parsed from repo_name."
+      - name: repo_slug
+        description: "Repository segment parsed from repo_name."
+      - name: total_event_count
+        description: "Total event count for the repository from dim_repos."
+      - name: push_event_count
+        description: "Repository-level push event count used for workflow ratio."
+      - name: pr_opened_event_count
+        description: "Repository-level PR-opened event count used for workflow ratio."
+      - name: push_pr_ratio
+        description: "Push to PR-open ratio (null when denominator is zero)."
+      - name: workflow_discipline_band
+        description: "Workflow posture label from repo_workflow_discipline."
+      - name: watch_event_count
+        description: "Watch event count from repo_growth_signals."
+      - name: fork_event_count
+        description: "Fork event count from repo_growth_signals."
+      - name: total_growth_signal_count
+        description: "Combined watch and fork event count."
+      - name: total_push_events
+        description: "Total push events rolled up from hourly_push_activity."
+      - name: total_pushed_commits
+        description: "Total pushed commits rolled up from hourly_push_activity."
+      - name: total_pr_review_events
+        description: "Total PR review events rolled up from pr_review_patterns."
