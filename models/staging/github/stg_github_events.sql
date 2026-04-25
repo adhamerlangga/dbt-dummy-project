@@ -1,3 +1,9 @@
+{{ config(
+    materialized = 'incremental',
+    unique_key = 'event_id',
+    on_schema_change = 'fail'
+) }}
+
 with source_events as (
     select
         raw_events.id as event_id,
@@ -18,6 +24,13 @@ with source_events as (
         raw_events.org.login as org_login,
         raw_events.org.url as org_url
     from {{ source('github_archive_raw', 'github_events') }} as raw_events
+
+    {% if is_incremental() %}
+        where cast(raw_events.created_at as timestamp) >= (
+            select coalesce(max(created_timestamp), timestamp '1900-01-01')
+            from {{ this }}
+        )
+    {% endif %}
 )
 
 select

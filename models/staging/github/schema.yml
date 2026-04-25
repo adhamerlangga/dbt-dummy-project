@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_github_events
-    description: "Cleaned GitHub Archive event data. Grain is one row per GitHub event."
+    description: "Incrementally loaded, cleaned GitHub Archive event data. Grain is one row per GitHub event, keyed by event_id with created_timestamp used as the incremental watermark."
     columns:
       - name: event_id
         description: "Primary key. Unique identifier for each GitHub event."
