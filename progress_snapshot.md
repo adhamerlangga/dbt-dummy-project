@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 25, 2026 at 1:38 PM
+> Last updated: April 25, 2026 at 1:49 PM
 
-## Overall: 60/80 tasks (75%)
+## Overall: 61/80 tasks (76%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -87,8 +87,8 @@
 - [x] Try incremental materialization
 - [x] Custom singular tests (transaction no more than future dates) 
 
-### Public Data Analysis — 9/11 (82%)
-`████████░░`
+### Public Data Analysis — 10/11 (91%)
+`█████████░`
 
 **Setup & Build**
 - [x] Pick dataset: GitHub Archive / Stack Overflow / COVID / weather
@@ -102,7 +102,7 @@
 - [x] Use dbt packages (dbt_utils)
 - [x] Implement incremental models
 - [x] Create custom tests
-- [ ] Build reusable macros
+- [x] Build reusable macros
 - [ ] Use variables in dbt_project.yml
 
 ### Leveling Up — 0/13 (0%)
