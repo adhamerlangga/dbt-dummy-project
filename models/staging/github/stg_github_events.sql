@@ -25,12 +25,10 @@ with source_events as (
         raw_events.org.url as org_url
     from {{ source('github_archive_raw', 'github_events') }} as raw_events
 
-    {% if is_incremental() %}
-        where cast(raw_events.created_at as timestamp) >= (
-            select coalesce(max(created_timestamp), timestamp '1900-01-01')
-            from {{ this }}
-        )
-    {% endif %}
+    {{ incremental_timestamp_filter(
+        'raw_events.created_at',
+        'created_timestamp'
+    ) }}
 )
 
 select
