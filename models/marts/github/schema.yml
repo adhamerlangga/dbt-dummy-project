@@ -73,11 +73,12 @@ models:
 
   - name: hourly_push_activity
     description: "Push activity by UTC hour at repo granularity."
-    tests:
-      - unique:
-          arguments:
-            column_name: repo_id || '-' || cast(push_date as varchar) || '-' || cast(push_hour_utc as varchar)
     columns:
+      - name: hourly_push_activity_id
+        description: "Surrogate primary key for the repo_id + push_date + push_hour_utc grain."
+        tests:
+          - not_null
+          - unique
       - name: repo_id
         description: "Repository identifier."
         tests:

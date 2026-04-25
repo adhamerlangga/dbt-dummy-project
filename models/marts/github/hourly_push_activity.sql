@@ -14,6 +14,7 @@ with push_events as (
 )
 
 select
+    {{ dbt_utils.generate_surrogate_key(['repo_id', 'push_date', 'push_hour_utc']) }} as hourly_push_activity_id,
     repo_id,
     repo_name,
     push_date,
