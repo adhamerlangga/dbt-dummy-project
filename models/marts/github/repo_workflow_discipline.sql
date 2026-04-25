@@ -34,8 +34,8 @@ select
     round(cast(push_event_count as double) / nullif(pr_opened_event_count, 0), 2) as push_pr_ratio,
     case
         when pr_opened_event_count = 0 then 'no_pr_activity'
-        when cast(push_event_count as double) / pr_opened_event_count <= 1.5 then 'pr_heavy'
-        when cast(push_event_count as double) / pr_opened_event_count <= 3 then 'balanced'
+        when cast(push_event_count as double) / pr_opened_event_count <= {{var('github_pr_heavy_ratio_threshold')}} then 'pr_heavy'
+        when cast(push_event_count as double) / pr_opened_event_count <= {{var('github_balanced_ratio_threshold')}} then 'balanced'
         else 'push_heavy'
     end as workflow_discipline_band
 from repo_metrics

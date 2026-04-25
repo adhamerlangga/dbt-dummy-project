@@ -4,7 +4,11 @@ with growth_events as (
         event_type,
         created_timestamp
     from {{ ref('stg_github_events') }}
-    where event_type in ('WatchEvent', 'ForkEvent')
+    where event_type in (
+        {% for event_type in var('github_growth_event_types') %}
+            '{{ event_type }}'{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    )
 ),
 
 repo_growth as (

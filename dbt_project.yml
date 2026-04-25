@@ -34,3 +34,11 @@ seeds:
     
     personal_finance:
       +schema: raw_personal_finance
+
+vars:
+  my_first_project:
+    github_pr_heavy_ratio_threshold: 1.5
+    github_balanced_ratio_threshold: 3
+    github_growth_event_types:
+    - WatchEvent
+    - ForkEvent
