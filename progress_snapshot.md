@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 18, 2026 at 2:42 PM
+> Last updated: April 25, 2026 at 8:25 AM
 
-## Overall: 51/80 tasks (64%)
+## Overall: 53/80 tasks (66%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -87,12 +87,12 @@
 - [x] Try incremental materialization
 - [x] Custom singular tests (transaction no more than future dates) 
 
-### Public Data Analysis — 0/11 (0%)
-`░░░░░░░░░░`
+### Public Data Analysis — 2/11 (18%)
+`██░░░░░░░░`
 
 **Setup & Build**
-- [ ] Pick dataset: GitHub Archive / Stack Overflow / COVID / weather
-- [ ] Download and load into DuckDB
+- [x] Pick dataset: GitHub Archive / Stack Overflow / COVID / weather
+- [x] Download and load into DuckDB
 - [ ] Staging layer for data cleanup
 - [ ] Identify 3–5 interesting questions
 - [ ] Build models to answer each question

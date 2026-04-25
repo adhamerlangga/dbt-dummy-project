@@ -2,6 +2,7 @@
 target/
 logs/
 *.duckdb
+.vscode/
 
 # Ignore dbt packages and internal packages
 dbt_packages/

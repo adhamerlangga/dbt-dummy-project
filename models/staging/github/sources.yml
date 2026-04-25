@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: github_archive_raw
+    description: "Raw GitHub Archive data from JSON files"
+    database: dev
+    schema: raw_github
+    tables:
+    - name: github_events
+      description: GitHub event data with columns for id, type, actor, repo, payload, public, created_at, org

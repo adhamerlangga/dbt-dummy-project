@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_github_events
+    description: "Cleaned GitHub Archive event data. Grain is one row per GitHub event."
+    columns:
+      - name: event_id
+        description: "Primary key. Unique identifier for each GitHub event."
+        tests:
+          - not_null
+          - unique
+
+      - name: event_type
+        description: "Type of GitHub event, such as PushEvent or PullRequestEvent."
+        tests:
+          - not_null
+
+      - name: actor_id
+        description: "Identifier for the user or bot that triggered the event."
+
+      - name: actor_login
+        description: "GitHub login for the actor that triggered the event."
+
+      - name: repo_id
+        description: "Identifier for the repository associated with the event."
+
+      - name: repo_name
+        description: "Full repository name in owner/repo format."
+
+      - name: repo_url
+        description: "API URL for the repository associated with the event."
+
+      - name: payload
+        description: "Raw event payload containing event-specific attributes."
+
+      - name: is_public
+        description: "Whether the event was marked public in GitHub Archive."
+
+      - name: created_timestamp
+        description: "Timestamp when the event was created."
+        tests:
+          - not_null
+
+      - name: org_id
+        description: "Identifier for the GitHub organization tied to the event, when present."
+
+      - name: org_login
+        description: "GitHub login for the organization tied to the event, when present."
+
+      - name: org_url
+        description: "API URL for the organization tied to the event, when present."
