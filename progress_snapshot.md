@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: April 25, 2026 at 7:25 PM
+> Last updated: April 29, 2026 at 5:06 AM
 
-## Overall: 62/80 tasks (78%)
+## Overall: 63/80 tasks (79%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -105,11 +105,11 @@
 - [x] Build reusable macros
 - [x] Use variables in dbt_project.yml
 
-### Leveling Up — 0/13 (0%)
-`░░░░░░░░░░`
+### Leveling Up — 1/13 (8%)
+`█░░░░░░░░░`
 
 **Deep Dives**
-- [ ] Snapshots (slowly changing dimensions)
+- [x] Snapshots (slowly changing dimensions)
 - [ ] Hooks (pre-hook, post-hook)
 - [ ] Exposures (dbt → BI tools)
 - [ ] Packages & community macros
