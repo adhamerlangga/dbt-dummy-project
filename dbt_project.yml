@@ -24,8 +24,6 @@ models:
     marts:
       +materialized: table
       +schema: marts
-      analytics:
-        +schema: marts
 
 seeds:
   my_first_project:
