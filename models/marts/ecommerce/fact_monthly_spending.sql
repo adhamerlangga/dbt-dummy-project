@@ -1,7 +1,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['spending_month', 'spending_classification'],
-    on_schema_change = 'fail'
+    on_schema_change = 'fail',
+    post_hook = 'analyze {{ this }}'
 ) }}
 
 with source as (

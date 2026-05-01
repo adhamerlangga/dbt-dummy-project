@@ -1,3 +1,7 @@
+{{ config(
+    post_hook = 'analyze {{ this }}'
+) }}
+
 with base as (
     select
         order_id,

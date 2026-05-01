@@ -4,7 +4,7 @@ sources:
   - name: ecommerce_raw
     description: "Raw Brazilian e-commerce data from Olist (Kaggle dataset)"
     database: dev
-    schema: main
+    schema: raw_ecommerce
     tables:
     - name: olist_customers_dataset
       description: Customer information including location data
