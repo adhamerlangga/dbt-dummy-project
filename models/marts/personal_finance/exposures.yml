@@ -1,0 +1,16 @@
+version: 2
+
+exposures:
+  - name: personal_finance_spending_dashboard
+    type: dashboard
+    maturity: medium
+    depends_on:
+      - ref('categories_spending_trend')
+      - ref('fact_monthly_spending')
+    label: Personal Finance Spending Dashboard
+    description: >
+      A dashboard for tracking monthly spending trends by spending classification
+      and comparing category-level spending changes over time.
+    owner:
+      name: "Data Team"
+      email: "data-team@example.com"

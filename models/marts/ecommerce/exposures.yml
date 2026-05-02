@@ -1,0 +1,16 @@
+version: 2
+
+exposures:
+  - name: ecommerce_sales_dashboard
+    type: dashboard
+    maturity: medium
+    depends_on:
+      - ref('fact_orders')
+      - ref('dim_customers')
+      - ref('dim_products')
+    label: Ecommerce Sales Dashboard
+    description: >
+      A dashboard that provides insights into sales performance, customer behavior, and product trends.
+    owner:
+      name: "Data Team"
+      email: "data-team@example.com"

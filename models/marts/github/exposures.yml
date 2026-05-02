@@ -1,0 +1,21 @@
+version: 2
+
+exposures:
+  - name: github_activity_dashboard
+    type: dashboard
+    maturity: medium
+    depends_on:
+      - ref('github_activity_summary')
+      - ref('dim_repos')
+      - ref('dim_actors')
+      - ref('repo_workflow_discipline')
+      - ref('repo_growth_signals')
+      - ref('hourly_push_activity')
+      - ref('pr_review_patterns')
+    label: GitHub Activity Dashboard
+    description: >
+      A dashboard for monitoring repository activity, workflow discipline, push patterns,
+      review behavior, and growth signals from GitHub event data.
+    owner:
+      name: "Data Team"
+      email: "data-team@example.com"
