@@ -239,36 +239,36 @@ const phases = [
       { title: 'Staging Layer', tasks: [
         { id: 'p2_4', text: 'Create <code>models/staging/</code> folder', done: true },
         { id: 'p2_5', text: 'Build stg_customers.sql', done: true },
-        { id: 'p2_6', text: 'Build stg_orders.sql', done: false },
-        { id: 'p2_7', text: 'Build stg_products.sql', done: false },
-        { id: 'p2_8', text: 'Build stg_order_items.sql', done: false },
-        { id: 'p2_9', text: 'Run <code>dbt run --select staging.*</code>', done: false },
-        { id: 'p2_10', text: 'Check generated tables in DuckDB', done: false },
+        { id: 'p2_6', text: 'Build stg_orders.sql', done: true },
+        { id: 'p2_7', text: 'Build stg_products.sql', done: true },
+        { id: 'p2_8', text: 'Build stg_order_items.sql', done: true },
+        { id: 'p2_9', text: 'Run <code>dbt run --select staging.*</code>', done: true },
+        { id: 'p2_10', text: 'Check generated tables in DuckDB', done: true },
       ]},
       { title: 'Sources & Tests', tasks: [
-        { id: 'p2_11', text: 'Create <code>models/staging/sources.yml</code>', done: false },
-        { id: 'p2_12', text: 'Define raw data sources', done: false },
-        { id: 'p2_13', text: 'Replace with <code>source()</code> function', done: false },
-        { id: 'p2_14', text: 'Add schema tests (unique, not_null, relationships)', done: false },
-        { id: 'p2_15', text: 'Run <code>dbt test</code> and fix failures', done: false },
+        { id: 'p2_11', text: 'Create <code>models/staging/sources.yml</code>', done: true },
+        { id: 'p2_12', text: 'Define raw data sources', done: true },
+        { id: 'p2_13', text: 'Replace with <code>source()</code> function', done: true },
+        { id: 'p2_14', text: 'Add schema tests (unique, not_null, relationships)', done: true },
+        { id: 'p2_15', text: 'Run <code>dbt test</code> and fix failures', done: true },
       ]},
       { title: 'Mart Layer', tasks: [
-        { id: 'p2_16', text: 'Create <code>models/marts/</code> folder', done: false },
-        { id: 'p2_17', text: 'Build fct_orders.sql', done: false },
-        { id: 'p2_18', text: 'Build dim_customers.sql', done: false },
-        { id: 'p2_19', text: 'Build dim_products.sql', done: false },
-        { id: 'p2_20', text: 'Run <code>dbt run --select marts.*</code>', done: false },
+        { id: 'p2_16', text: 'Create <code>models/marts/</code> folder', done: true },
+        { id: 'p2_17', text: 'Build fct_orders.sql', done: true },
+        { id: 'p2_18', text: 'Build dim_customers.sql', done: true },
+        { id: 'p2_19', text: 'Build dim_products.sql', done: true },
+        { id: 'p2_20', text: 'Run <code>dbt run --select marts.*</code>', done: true },
       ]},
       { title: 'Analytics Layer', tasks: [
-        { id: 'p2_21', text: 'Build customer_lifetime_value.sql', done: false },
-        { id: 'p2_22', text: 'Build monthly_revenue.sql', done: false },
-        { id: 'p2_23', text: 'Build product_performance.sql', done: false },
-        { id: 'p2_24', text: 'Build cohort_analysis.sql (optional)', done: false },
+        { id: 'p2_21', text: 'Build customer_lifetime_value.sql', done: true },
+        { id: 'p2_22', text: 'Build monthly_revenue.sql', done: true },
+        { id: 'p2_23', text: 'Build product_performance.sql', done: true },
+        { id: 'p2_24', text: 'Build cohort_analysis.sql (optional)', done: true },
       ]},
       { title: 'Documentation', tasks: [
-        { id: 'p2_25', text: 'Add descriptions to models in schema.yml', done: false },
-        { id: 'p2_26', text: 'Run <code>dbt docs generate</code> + <code>dbt docs serve</code>', done: false },
-        { id: 'p2_27', text: 'Document at least 3 key models', done: false },
+        { id: 'p2_25', text: 'Add descriptions to models in schema.yml', done: true },
+        { id: 'p2_26', text: 'Run <code>dbt docs generate</code> + <code>dbt docs serve</code>', done: true },
+        { id: 'p2_27', text: 'Document at least 3 key models', done: true },
       ]}
     ]
   },
@@ -276,20 +276,20 @@ const phases = [
     id: 'phase3', title: 'Personal Finance Tracker', subtitle: 'Week 2–3 · Project 2', color: '#a78bfa',
     sections: [
       { title: 'Setup', tasks: [
-        { id: 'p3_1', text: 'Create new dbt project or add folder', done: false },
-        { id: 'p3_2', text: 'Find/create personal finance CSV dataset', done: false },
-        { id: 'p3_3', text: 'Load transaction data as seeds', done: false },
+        { id: 'p3_1', text: 'Create new dbt project or add folder', done: true },
+        { id: 'p3_2', text: 'Find/create personal finance CSV dataset', done: true },
+        { id: 'p3_3', text: 'Load transaction data as seeds', done: true },
       ]},
       { title: 'Build Pipeline', tasks: [
-        { id: 'p3_4', text: 'Staging: clean transaction data (dates, categories, amounts)', done: false },
-        { id: 'p3_5', text: 'Marts: monthly spending summaries', done: false },
-        { id: 'p3_6', text: 'Analytics: category trends over time', done: false },
+        { id: 'p3_4', text: 'Staging: clean transaction data (dates, categories, amounts)', done: true },
+        { id: 'p3_5', text: 'Marts: monthly spending summaries', done: true },
+        { id: 'p3_6', text: 'Analytics: category trends over time', done: true },
       ]},
       { title: 'Advanced Features', tasks: [
-        { id: 'p3_7', text: 'Custom macro for categorization logic', done: false },
-        { id: 'p3_8', text: 'Data quality tests (no future dates, amount ranges)', done: false },
-        { id: 'p3_9', text: 'Try incremental materialization', done: false },
-        { id: 'p3_10', text: 'Custom singular tests (transaction no more than future dates) ', done: false },
+        { id: 'p3_7', text: 'Custom macro for categorization logic', done: true },
+        { id: 'p3_8', text: 'Data quality tests (no future dates, amount ranges)', done: true },
+        { id: 'p3_9', text: 'Try incremental materialization', done: true },
+        { id: 'p3_10', text: 'Custom singular tests (transaction no more than future dates) ', done: true },
       ]}
     ]
   },
@@ -297,19 +297,19 @@ const phases = [
     id: 'phase4', title: 'Public Data Analysis', subtitle: 'Week 3–4 · Project 3', color: '#4ade80',
     sections: [
       { title: 'Setup & Build', tasks: [
-        { id: 'p4_1', text: 'Pick dataset: GitHub Archive / Stack Overflow / COVID / weather', done: false },
-        { id: 'p4_2', text: 'Download and load into DuckDB', done: false },
-        { id: 'p4_3', text: 'Staging layer for data cleanup', done: false },
-        { id: 'p4_4', text: 'Identify 3–5 interesting questions', done: false },
-        { id: 'p4_5', text: 'Build models to answer each question', done: false },
-        { id: 'p4_6', text: 'Create final "dashboard" model', done: false },
+        { id: 'p4_1', text: 'Pick dataset: GitHub Archive / Stack Overflow / COVID / weather', done: true },
+        { id: 'p4_2', text: 'Download and load into DuckDB', done: true },
+        { id: 'p4_3', text: 'Staging layer for data cleanup', done: true },
+        { id: 'p4_4', text: 'Identify 3–5 interesting questions', done: true },
+        { id: 'p4_5', text: 'Build models to answer each question', done: true },
+        { id: 'p4_6', text: 'Create final "dashboard" model', done: true },
       ]},
       { title: 'Advanced Concepts', tasks: [
-        { id: 'p4_7', text: 'Use dbt packages (dbt_utils)', done: false },
-        { id: 'p4_8', text: 'Implement incremental models', done: false },
-        { id: 'p4_9', text: 'Create custom tests', done: false },
-        { id: 'p4_10', text: 'Build reusable macros', done: false },
-        { id: 'p4_11', text: 'Use variables in dbt_project.yml', done: false },
+        { id: 'p4_7', text: 'Use dbt packages (dbt_utils)', done: true },
+        { id: 'p4_8', text: 'Implement incremental models', done: true },
+        { id: 'p4_9', text: 'Create custom tests', done: true },
+        { id: 'p4_10', text: 'Build reusable macros', done: true },
+        { id: 'p4_11', text: 'Use variables in dbt_project.yml', done: true },
       ]}
     ]
   },
@@ -317,9 +317,9 @@ const phases = [
     id: 'phase5', title: 'Leveling Up', subtitle: 'Ongoing', color: '#fbbf24',
     sections: [
       { title: 'Deep Dives', tasks: [
-        { id: 'p5_1', text: 'Snapshots (slowly changing dimensions)', done: false },
-        { id: 'p5_2', text: 'Hooks (pre-hook, post-hook)', done: false },
-        { id: 'p5_3', text: 'Exposures (dbt → BI tools)', done: false },
+        { id: 'p5_1', text: 'Snapshots (slowly changing dimensions)', done: true },
+        { id: 'p5_2', text: 'Hooks (pre-hook, post-hook)', done: true },
+        { id: 'p5_3', text: 'Exposures (dbt → BI tools)', done: true },
         { id: 'p5_4', text: 'Packages & community macros', done: false },
         { id: 'p5_5', text: 'Orchestration concepts (dbt Cloud / Airflow)', done: false },
       ]},
@@ -356,7 +356,7 @@ let state = {};
 
 function loadState() {
   try {
-    const saved = localStorage.getItem('dbt_state_v2');
+    const saved = localStorage.getItem('dbt_state_v3');
     if (saved) {
       const parsed = JSON.parse(saved);
       state = parsed.tasks || {};
@@ -380,7 +380,7 @@ function initState() {
 function saveState() {
   const notes = document.getElementById('notes-area')?.value || '';
   try {
-    localStorage.setItem('dbt_state_v2', JSON.stringify({ tasks: state, notes, updatedAt: new Date().toISOString() }));
+    localStorage.setItem('dbt_state_v3', JSON.stringify({ tasks: state, notes, updatedAt: new Date().toISOString() }));
   } catch(e) {}
 }
 
