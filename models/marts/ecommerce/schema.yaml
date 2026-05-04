@@ -1,135 +1,255 @@
 version: 2
 
 models:
+  - name: dim_customers
+    description: >
+      Customer dimension at customer_id grain. This model preserves the Olist
+      customer identifier, the cross-order customer_unique_id, and customer
+      location attributes used for customer and geography analysis.
+    columns:
+      - name: customer_id
+        description: "Primary key for an Olist customer record."
+        tests:
+          - not_null
+          - unique
+
+      - name: customer_unique_id
+        description: >
+          Stable customer identity used to connect multiple customer_id records
+          that belong to the same real-world customer.
+        tests:
+          - not_null
+
+      - name: customer_zip_code_prefix
+        description: "Customer location ZIP code prefix from the raw Olist dataset."
+
+      - name: customer_city
+        description: "Customer city from the raw Olist dataset."
+
+      - name: customer_state
+        description: "Customer state from the raw Olist dataset."
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: >
+      Product dimension at product_id grain. This model contains product
+      category and listing attributes used to group sales and product
+      performance metrics.
+    columns:
+      - name: product_id
+        description: "Primary key for a product in the Olist product catalog."
+        tests:
+          - not_null
+          - unique
+
+      - name: product_category_name
+        description: >
+          Product category name from the source catalog. This can be null when
+          the source does not classify the product.
+
+      - name: product_name_length
+        description: "Character count of the product name in the source listing."
+
+      - name: product_description_length
+        description: "Character count of the product description in the source listing."
+
+      - name: product_photos_qty
+        description: "Number of photos included in the product listing."
+
+      - name: product_weight_g
+        description: "Product weight in grams."
+
+      - name: product_length_cm
+        description: "Product length in centimeters."
+
+      - name: product_height_cm
+        description: "Product height in centimeters."
+
+      - name: product_width_cm
+        description: "Product width in centimeters."
+
   - name: fact_orders
-    description: "Fact table containing order-level metrics and dimensions for analysis"
+    description: >
+      Order item fact table at order_id + order_item_id grain. Each row
+      represents one product line item within an order. The model combines
+      order header attributes, product category, item price, freight cost, and
+      total_item_revenue where total_item_revenue = price + freight_value.
     tests:
       - unique:
           arguments:
-            column_name: order_id ||'-'|| order_item_id
+            column_name: order_id || '-' || order_item_id
     columns:
-
       - name: order_item_id
-        description: "Unique identifier for each order item."
+        description: "Line item sequence number within an order."
         tests:
           - not_null
 
       - name: order_id
-        description: "Unique identifier for each order."
+        description: "Order identifier. Not unique in this model because one order can have multiple items."
         tests:
           - not_null
 
+      - name: product_id
+        description: "Foreign key to dim_products."
+
+      - name: seller_id
+        description: "Identifier for the seller fulfilling this order item."
+
       - name: customer_id
-        description: "Foreign key to stg_customers. Links order to a customer."
+        description: "Foreign key to dim_customers. Links the order item to a customer record."
         tests:
           - not_null
           - relationships:
               arguments:
-                to: ref('stg_customers')
+                to: ref('dim_customers')
                 field: customer_id
 
+      - name: order_status
+        description: "Lifecycle status of the order from the order header source."
+
+      - name: product_category_name
+        description: "Product category brought in from dim_products for sales analysis."
+
+      - name: order_purchased_at
+        description: "Timestamp when the order was placed."
+
+      - name: order_approved_at
+        description: "Timestamp when payment was approved, when available."
+
+      - name: order_delivered_carrier_at
+        description: "Timestamp when the order was handed to the carrier, when available."
+
+      - name: order_delivered_customer_at
+        description: "Timestamp when the order was delivered to the customer, when available."
+
+      - name: order_estimated_delivery_at
+        description: "Estimated delivery timestamp captured at purchase time."
+
       - name: price
-        description: "Total price of the order"
+        description: "Item price for this order line, excluding freight."
         tests:
           - not_null
 
       - name: freight_value
-        description: "Freight cost for the order"
+        description: "Freight cost allocated to this order line."
+        tests:
+          - not_null
+
+      - name: total_item_revenue
+        description: "Revenue for this order line, calculated as price + freight_value."
         tests:
           - not_null
 
   - name: monthly_revenue
-    description: "Monthly revenue aggregated from delivered orders"
+    description: >
+      Monthly ecommerce revenue summary for delivered orders only. Revenue is
+      grouped by delivery month and calculated from fact_orders.total_item_revenue.
     columns:
       - name: revenue_month
-        description: "First day of the month for the reporting period"
+        description: "Month bucket based on order_delivered_customer_at, truncated to the first day of month."
         tests:
           - unique
           - not_null
 
       - name: total_revenue
-        description: "Sum of total item revenue for delivered orders"
+        description: "Sum of total_item_revenue for delivered orders in the month."
         tests:
           - not_null
-  
+
+      - name: total_orders
+        description: "Distinct delivered order count in the month."
+
+      - name: total_customers
+        description: "Distinct customers with delivered orders in the month."
+
+      - name: avg_order_value
+        description: >
+          Average order-item revenue in the month based on fact_orders rows,
+          rounded to two decimal places.
+
   - name: product_performance
-    description: "Performance metrics for products based on delivered orders"
+    description: >
+      Product category performance summary for delivered orders only. Null
+      categories are reported as Uncategorized so product revenue is not dropped
+      from category-level reporting.
     columns:
       - name: product_category_name
-        description: "Category of the product"
+        description: "Product category used as the reporting grain, with nulls coalesced to Uncategorized."
         tests:
           - unique
           - not_null
-  
+
+      - name: total_orders
+        description: "Distinct delivered order count for the product category."
+
+      - name: total_revenue
+        description: "Sum of total_item_revenue for delivered order items in the product category."
+
+      - name: average_order_value
+        description: "Total revenue divided by distinct delivered orders for the product category."
+
+      - name: total_products_sold
+        description: "Distinct product_id count sold in delivered orders for the category."
+
+      - name: total_sellers
+        description: "Distinct seller count for delivered order items in the category."
+
+      - name: orders_per_product
+        description: "Distinct delivered orders divided by distinct products sold for the category."
+
   - name: customer_lifetime_value
-    description: "Lifetime value of each customer based on their orders"
+    description: >
+      Customer lifetime value summary at customer_unique_id grain for delivered
+      orders only. Metrics roll up order-item revenue to the stable customer
+      identity, so repeat purchases across customer_id records are analyzed
+      together.
     columns:
       - name: customer_unique_id
-        description: "Unique identifier for each customer"
+        description: "Stable customer identity used as the model grain."
         tests:
           - unique
           - not_null
-  
+
+      - name: total_orders
+        description: "Distinct delivered orders placed by the customer."
+
+      - name: total_revenue
+        description: "Sum of total_item_revenue across the customer's delivered order items."
+
+      - name: avg_order_value
+        description: "Customer total revenue divided by distinct delivered orders."
+
+      - name: first_order_date
+        description: "Earliest delivered order purchase timestamp for the customer."
+
+      - name: last_order_date
+        description: "Latest delivered order purchase timestamp for the customer."
+
+      - name: customer_lifetime_days
+        description: "Day difference between the customer's first and last delivered order purchase timestamps."
+
   - name: cohort_analysis
-    description: "Cohort analysis of customer retention"
+    description: >
+      Monthly customer retention model. A customer's cohort is the month of
+      their first delivered order, and retention is measured by whether the
+      customer placed delivered orders in later month offsets.
     columns:
       - name: cohort_month
-        description: "First month of the cohort based on customer's first order"
+        description: "Month of the customer's first delivered order."
         tests:
           - not_null
-      
+
       - name: months_since_first_order
-        description: "Number of months since the customer's first order"
-        tests:
-          - not_null
-  
-  - name: fact_monthly_spending
-    description: "Fact table containing monthly spending metrics"
-    tests:
-      - unique:
-          arguments:
-            column_name: spending_month || '-' || category
-    columns:
-      - name: spending_month
-        description: "First day of the month for the reporting period"
-        tests:
-          - not_null
-      
-      - name: category
-        description: "Category of the spending"
+        description: "Number of months between the cohort month and the reporting month."
         tests:
           - not_null
 
-      - name: total_spending
-        description: "Total spending in the month"
-        tests:
-          - not_null
+      - name: total_customers
+        description: "Number of customers assigned to the cohort."
 
-      - name: total_transactions
-        description: "Total number of transactions in the month"
-        tests:
-          - not_null
-      
-      - name: avg_transaction_amount
-        description: "Average amount per transaction in the month"
-        tests:
-          - not_null
-  
-  - name: categories_spending_trend
-    description: "Trends in spending by category over time"
-    tests:
-      - unique:
-          arguments:
-            column_name: spending_month || '-' || category
-    columns:
-      - name: spending_month
-        description: "First day of the month for the reporting period"
-        tests:
-          - not_null
-      
-      - name: category
-        description: "Category of the spending"
-        tests:
-          - not_null
-      
-      
+      - name: retained_customers
+        description: "Number of cohort customers with delivered order activity in the month offset."
+
+      - name: retention_rate
+        description: "Retained customers divided by total cohort customers for the month offset."

@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_expenses
+    description: >
+      Cleaned personal finance transaction data at transaction grain. This
+      model casts transaction_date and amount to analytic types and derives
+      spending_classification using the classify_spending macro from
+      spending_type, category, and subcategory.
+    columns:
+      - name: transaction_date
+        description: "Transaction date parsed from the raw CSV value."
+        tests:
+          - not_null
+
+      - name: spending_type
+        description: >
+          Raw high-level spending intent from the source, such as Kebutuhan,
+          Keinginan, or Tabungan.
+
+      - name: category
+        description: "Raw spending category from the source transaction."
+
+      - name: subcategory
+        description: "Raw spending subcategory used with category to classify spending."
+
+      - name: merchant_name
+        description: "Merchant or payee name for the transaction."
+
+      - name: amount
+        description: "Transaction amount cast to decimal(15,2)."
+        tests:
+          - not_null
+
+      - name: spending_classification
+        description: >
+          Business-friendly spending bucket derived by classify_spending. The
+          macro groups raw spending_type/category/subcategory combinations into
+          reporting classes such as Essential Food, Discretionary Food,
+          Essential Transport, Savings, and Other.
+        tests:
+          - not_null

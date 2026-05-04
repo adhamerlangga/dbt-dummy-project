@@ -1,0 +1,78 @@
+version: 2
+
+models:
+  - name: fact_monthly_spending
+    description: >
+      Monthly personal finance spending fact at spending_month +
+      spending_classification grain. The model rolls transaction-level expenses
+      into monthly totals and transaction counts, using spending_classification
+      from stg_expenses as the reporting category.
+    tests:
+      - unique:
+          arguments:
+            column_name: spending_month || '-' || spending_classification
+    columns:
+      - name: spending_month
+        description: "Month bucket for the transaction date, truncated to the first day of month."
+        tests:
+          - not_null
+
+      - name: spending_classification
+        description: >
+          Derived spending bucket from classify_spending, used as the category
+          grain for monthly spending analysis.
+        tests:
+          - not_null
+
+      - name: total_spending
+        description: "Sum of transaction amount for the month and spending classification."
+        tests:
+          - not_null
+
+      - name: total_transactions
+        description: "Number of transactions in the month and spending classification."
+        tests:
+          - not_null
+
+      - name: avg_transaction_amount
+        description: "Average transaction amount for the month and spending classification."
+        tests:
+          - not_null
+
+  - name: categories_spending_trend
+    description: >
+      Month-over-month spending trend model at spending_month +
+      spending_classification grain. It compares each classification's monthly
+      spending against the previous month using a lag window partitioned by
+      spending_classification.
+    tests:
+      - unique:
+          arguments:
+            column_name: spending_month || '-' || spending_classification
+    columns:
+      - name: spending_month
+        description: "Month bucket for the spending trend row."
+        tests:
+          - not_null
+
+      - name: spending_classification
+        description: "Derived spending bucket used to partition month-over-month trend calculations."
+        tests:
+          - not_null
+
+      - name: total_spending
+        description: "Monthly spending amount for the classification."
+
+      - name: total_transactions
+        description: "Monthly transaction count for the classification."
+
+      - name: prev_month_spending
+        description: "Previous month's total_spending for the same spending classification."
+
+      - name: mom_change_amount
+        description: "Current month total_spending minus prev_month_spending."
+
+      - name: mom_change_pct
+        description: >
+          Month-over-month percentage change in spending. Null when the
+          previous month value is zero or unavailable.

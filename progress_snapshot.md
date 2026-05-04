@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: May 4, 2026 at 8:28 AM
+> Last updated: May 5, 2026 at 12:54 AM
 
-## Overall: 71/80 tasks (89%)
+## Overall: 72/80 tasks (90%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -105,8 +105,8 @@
 - [x] Build reusable macros
 - [x] Use variables in dbt_project.yml
 
-### Leveling Up — 9/13 (69%)
-`███████░░░`
+### Leveling Up — 10/13 (77%)
+`████████░░`
 
 **Deep Dives**
 - [x] Snapshots (slowly changing dimensions)
@@ -120,7 +120,7 @@
 - [x] Naming convention for models
 - [x] Folder structure (staging/intermediate/marts/analytics)
 - [x] Tests for all critical models
-- [ ] Document business logic
+- [x] Document business logic
 
 **TIL Doc**
 - [ ] Start markdown TIL file
@@ -136,4 +136,3 @@
 - [ ] CI/CD with GitHub Actions
 - [ ] Connect dbt to BI tool (Metabase/Superset)
 - [ ] Write a blog post about learnings
-
