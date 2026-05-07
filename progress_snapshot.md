@@ -1,7 +1,7 @@
 # dbt Learning Roadmap — Progress Snapshot
-> Last updated: May 5, 2026 at 12:54 AM
+> Last updated: May 6, 2026 at 10:52 PM
 
-## Overall: 72/77 tasks (94%)
+## Overall: 73/77 tasks (95%)
 
 ### Setup & Foundation — 14/14 (100%)
 `██████████`
@@ -122,12 +122,13 @@
 - [x] Tests for all critical models
 - [x] Document business logic
 
-### Bonus Challenges — 0/5 (0%)
-`░░░░░░░░░░`
+### Bonus Challenges — 1/5 (20%)
+`██░░░░░░░░`
 
 **Challenges**
-- [ ] Rebuild project using Jinja
+- [x] Rebuild project using Jinja
 - [ ] Create custom materialization
 - [ ] CI/CD with GitHub Actions
 - [ ] Connect dbt to BI tool (Metabase/Superset)
 - [ ] Write a blog post about learnings
+

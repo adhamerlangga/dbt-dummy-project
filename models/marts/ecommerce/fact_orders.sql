@@ -1,5 +1,5 @@
 {{ config(
-    post_hook = 'analyze {{ this }}'
+    materialized = 'analyzed_table'
 ) }}
 
 with base as (
