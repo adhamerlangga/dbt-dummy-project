@@ -12,4 +12,3 @@ dbt_internal_packages/
 
 # Ignore data files
 seeds/personal_finance/personal_finance.csv
-data/github_archive/

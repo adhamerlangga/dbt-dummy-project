@@ -1,0 +1,84 @@
+name: dbt CI
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+        branches:
+        - main
+
+jobs:
+    dbt-ci:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+    
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+            
+            - name: Install dbt
+              run: pip install dbt-duckdb
+            
+            - name: Install dbt packages
+              run: dbt deps
+            
+            - name: Create dbt profile
+              run: |
+                mkdir -p ~/.dbt
+                cat > ~/.dbt/profiles.yml <<EOF
+                my_first_project:
+                  target: dev
+                  outputs:
+                    dev:
+                      type: duckdb
+                      path: dev.duckdb
+                      schema: main
+                      threads: 4
+                EOF
+
+            - name: Load seed-backed raw sources
+              run: dbt seed
+
+            - name: Load GitHub raw source
+              run: |
+                python <<'PY'
+                import duckdb
+
+                con = duckdb.connect("dev.duckdb")
+                con.sql("create schema if not exists raw_github")
+                con.sql("""
+                    create or replace table raw_github.github_events as
+                    select *
+                    from read_json_auto(
+                        'data/github_archive/*.json.gz',
+                        ignore_errors = true
+                    )
+                """)
+                print(con.sql("select count(*) from raw_github.github_events").fetchall())
+                con.close()
+                PY
+
+            - name: Verify GitHub raw source
+              run: |
+                python <<'PY'
+                import duckdb
+
+                con = duckdb.connect("dev.duckdb")
+                print(con.sql("""
+                    select table_schema, table_name
+                    from information_schema.tables
+                    where table_schema = 'raw_github'
+                """).fetchall())
+                print(con.sql("describe raw_github.github_events").fetchall())
+                con.close()
+                PY
+
+            - name: Compile dbt project
+              run: dbt compile
+            
+            - name: Build dbt project
+              run: dbt build --exclude resource_type:seed
