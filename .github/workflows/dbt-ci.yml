@@ -26,6 +26,20 @@ jobs:
             - name: Install dbt packages
               run: dbt deps
             
+            - name: Create dbt profile
+              run: |
+                mkdir -p ~/.dbt
+                cat > ~/.dbt/profiles.yml <<EOF
+                my_first_project:
+                  target: dev
+                  outputs:
+                    dev:
+                      type: duckdb
+                      path: my_first_project.duckdb
+                      schema: main
+                      threads: 4
+                EOF
+
             - name: Compile dbt project
               run: dbt compile
             

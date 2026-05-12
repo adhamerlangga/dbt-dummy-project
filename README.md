@@ -1,194 +1,230 @@
-# dbt Learning Journey
+# dbt DuckDB Learning Project
 
-A structured, hands-on dbt learning project built around progressively complex real-world pipelines. Rather than following a single tutorial, this repo is organized as a series of self-contained projects — each one introducing new dbt concepts on top of the last.
+A hands-on dbt learning repo built around progressively larger analytics engineering projects. The goal is not just to write SQL models, but to practice dbt project structure, source definitions, tests, documentation, macros, incremental models, snapshots, exposures, and CI/CD-ready conventions.
 
-All projects use **dbt-duckdb** as the local analytical engine. No cloud warehouse required.
+This project uses **dbt-duckdb** so the full warehouse workflow can run locally without a cloud data warehouse.
 
----
+## Current Status
 
-## Projects
+Progress source: `progress_snapshot.md` and `dbt_roadmap.html`.
 
-| # | Project | Dataset | Status | Key Concepts |
-|---|---------|---------|--------|--------------|
-| 1 | [E-Commerce Analytics Pipeline](#1-e-commerce-analytics-pipeline) | Olist (Kaggle) | ✅ 89% complete | Staging/marts/analytics layers, sources, tests, macros, dbt_utils |
-| 2 | [Personal Finance Tracker](#2-personal-finance-tracker) | Personal CSV exports | 🔜 Planned | Incremental models, custom macros, budget vs actual |
-| 3 | [Public Data Analysis](#3-public-data-analysis) | TBD (GitHub Archive / COVID / Weather) | 🔜 Planned | dbt variables, custom tests, incremental models |
+Overall progress is **73 of 77 tasks complete, or 95%**.
 
----
+| Phase | Status | Progress |
+| --- | --- | --- |
+| Setup & Foundation | Complete | 14/14 |
+| E-commerce Analytics Pipeline | Complete | 27/27 |
+| Personal Finance Tracker | Complete | 10/10 |
+| Public Data Analysis | Complete | 11/11 |
+| Leveling Up | Complete | 10/10 |
+| Bonus Challenges | In progress | 1/5 |
+
+Remaining bonus work:
+
+- Create a custom materialization
+- Finish CI/CD with GitHub Actions
+- Connect dbt to a BI tool such as Metabase or Superset
+- Write a blog post about learnings
+
+Note: `progress_snapshot.md` marks "Rebuild project using Jinja" complete. `dbt_roadmap.html` still lists that bonus item as incomplete, so the snapshot is treated as the current source of truth.
 
 ## Stack
 
-| Tool | Version | Role |
-|------|---------|------|
-| [dbt-duckdb](https://github.com/duckdb/dbt-duckdb) | 1.10.0 | Transformation layer |
-| [DuckDB](https://duckdb.org/) | 1.4.4 | Local analytical database |
-| [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) | 1.3.0 | Utility macros (date spine, etc.) |
-| Python | 3.x | Runtime environment |
+| Tool | Purpose |
+| --- | --- |
+| dbt Core + dbt-duckdb | Transformation framework and DuckDB adapter |
+| DuckDB | Local analytical database |
+| dbt_utils | Community macro package |
+| Python | Runtime environment |
+| GitHub Actions | Planned/active CI workflow area |
 
----
+## Project Layout
 
-## Project 1: E-Commerce Analytics Pipeline
-
-**Dataset:** [Olist Brazilian E-Commerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — 100k orders from 2016–2018 across Brazilian marketplaces.
-
-**Status:** ✅ Models complete | ⏳ Documentation in progress
-
-The first and most complete project. Builds a full analytics pipeline from raw CSV seeds to business-ready aggregation models, following a three-layer architecture.
-
-### Architecture
-
-```
-Raw (DuckDB seeds)
-       │
-       ▼
-  [ Staging ]  ── views ──  Cleaned, typed, renamed source data
-       │
-       ▼
-  [  Marts  ]  ── tables ── Dimensional & fact models (star schema)
-       │
-       ▼
- [ Analytics ] ── tables ── Business aggregations & metrics
+```text
+models/
+  staging/
+    ecommerce/
+    personal_finance/
+    github/
+  intermediate/
+    github/
+  marts/
+    ecommerce/
+    personal_finance/
+    github/
+macros/
+snapshots/
+seeds/
+tests/
 ```
 
-### Models
+The repo follows a common analytics engineering pattern:
 
-**Staging** (`dev.staging.*`)
+- **Staging** models are close to source tables. They clean names, cast types, and apply light standardization.
+- **Intermediate** models hold reusable business logic that should not be exposed as final reporting tables.
+- **Marts** models are business-facing facts, dimensions, summaries, and dashboard-ready outputs.
+- **Tests** cover primary keys, relationships, accepted values, and custom business assertions.
+- **Macros** hold reusable SQL/Jinja logic.
 
-| Model | Description |
-|-------|-------------|
-| `stg_customers` | Customer identifiers and location. Preserves both `customer_id` (per-order) and `customer_unique_id` (true customer). |
-| `stg_orders` | Order headers with all timestamps from purchase through delivery. |
-| `stg_order_items` | Line-item grain. One row per `order_id` + `order_item_id`. |
-| `stg_products` | Product catalog with dimensions and categories. Fixes source typos (`lenght` → `length`). |
+## Projects
 
-**Marts** (`dev.marts.*`)
+### 1. E-commerce Analytics Pipeline
 
-| Model | Description |
-|-------|-------------|
-| `dim_customers` | Customer dimension with unique customer identifier. |
-| `dim_products` | Product dimension with category and physical attributes. |
-| `fact_orders` | Central fact table. Grain: one row per order line item. Includes `total_item_revenue` (price + freight). |
+Dataset: Olist Brazilian E-Commerce public dataset.
 
-**Analytics** (`dev.marts.*` via `analytics/` subfolder)
+This is the core star-schema style project. Raw CSV data is loaded through seeds, staged into cleaned source-aligned models, and transformed into marts and analytics models.
 
-| Model | Description |
-|-------|-------------|
-| `monthly_revenue` | Monthly revenue trend using delivery date as the time anchor (accrual basis). |
-| `product_performance` | Category-level metrics: revenue, orders, sellers, and orders-per-product ratio. |
-| `customer_lifetime_value` | Per-customer aggregation using `customer_unique_id` to handle Olist's order-scoped `customer_id` correctly. |
-| `cohort_analysis` | Monthly acquisition cohorts with retention rates. Uses `dbt_utils.date_spine` to fill period gaps. |
+Key models:
 
-### Key Design Decisions
+| Layer | Models |
+| --- | --- |
+| Staging | `stg_customers`, `stg_orders`, `stg_order_items`, `stg_products` |
+| Marts | `dim_customers`, `dim_products`, `fact_orders` |
+| Analytics | `monthly_revenue`, `product_performance`, `customer_lifetime_value`, `cohort_analysis` |
 
-**Schema separation via custom macro** — dbt's default behavior concatenates the target schema and custom schema (e.g., `main_staging`). The `generate_schema_name` macro is overridden to produce clean schema names (`staging`, `marts`) regardless of target environment.
+Key dbt concepts practiced:
 
-**`customer_unique_id` for customer-level analysis** — Olist uses `customer_id` as a per-order identifier. A real customer can have many `customer_id` values across orders. All customer-level aggregations join through `customer_unique_id` to avoid inflating customer counts.
+- `source()` for raw data references
+- `ref()` for DAG-aware model dependencies
+- Schema tests for primary keys and relationships
+- Singular test for positive monthly revenue
+- Custom schema naming via `generate_schema_name`
+- `dbt_utils.date_spine` for cohort period scaffolding
 
-**Delivery date as revenue anchor** — `monthly_revenue` uses `order_delivered_customer_at` rather than `order_purchase_timestamp`, reflecting accrual-basis recognition: revenue is counted when delivery is complete.
+Important modeling decision: customer-level analysis uses `customer_unique_id`, not only `customer_id`, because Olist's `customer_id` is order-scoped while `customer_unique_id` is the stable customer identity.
 
-**Float rounding on financial columns** — Aggregated revenue columns use `round(..., 2)` to prevent floating-point precision artifacts in financial reporting.
+### 2. Personal Finance Tracker
 
-### Tests
+Dataset: sample personal finance CSV seed.
 
-**Schema tests** (defined in `schema.yaml`):
-- `unique` and `not_null` on all primary keys
-- `relationships` to validate FK integrity across staging and mart layers
-- `accepted_values` on `order_status`
+This project models transaction-level expense data into monthly spending summaries and trend analysis.
 
-**Singular test** (`tests/assert_monthly_revenue_positive.sql`):
-- Asserts no month has zero or negative total revenue
+Key models:
 
----
+| Layer | Models |
+| --- | --- |
+| Staging | `stg_expenses` |
+| Marts | `fact_monthly_spending`, `categories_spending_trend` |
 
-## Project 2: Personal Finance Tracker
+Key dbt concepts practiced:
 
-> 🔜 **Status: Planned**
+- Custom categorization macro: `classify_spending`
+- Incremental filtering macro: `incremental_timestamp_filter`
+- Custom singular tests for expense quality
+- Month-over-month trend logic using SQL window functions
+- Exposures for BI-facing assets
 
-A dbt pipeline built on top of personal financial transaction exports (bank statements, credit cards). The focus shifts from analytical breadth to analytical *depth on a known domain* — and introduces concepts not covered in the e-commerce project.
+### 3. Public Data Analysis: GitHub Archive
 
-**Planned concepts:**
-- **Incremental materialization** — process only new transactions rather than full table rebuilds
-- **Custom categorization macro** — Jinja-based logic to map raw merchant names to spending categories
-- **Budget vs actual** — mart-level model comparing planned budgets against real spending
-- **Custom singular tests** — assert that no category exceeds a defined monthly threshold
-- **YoY comparisons** — analytics model using window functions for year-over-year trend analysis
+Dataset: GitHub Archive event data loaded into DuckDB.
 
----
+This project is closer to open-ended analytics work: define questions, model useful entities, and produce dashboard-ready outputs.
 
-## Project 3: Public Data Analysis
+Key models:
 
-> 🔜 **Status: Planned**
+| Layer | Models |
+| --- | --- |
+| Staging | `stg_github_events` |
+| Intermediate | `int_github_repo_activity_state` |
+| Marts | `dim_repos`, `dim_actors`, `hourly_push_activity`, `repo_workflow_discipline`, `repo_growth_signals`, `pr_review_patterns`, `github_activity_summary` |
+| Snapshots | `github_repo_activity_state_snapshot` |
 
-An open-ended analytical project on a large public dataset (candidates: GitHub Archive, Stack Overflow, COVID, or weather data). The goal is to practice identifying interesting questions and building models to answer them — closer to real analytics engineering work than following a predefined schema.
+Key dbt concepts practiced:
 
-**Planned concepts:**
-- **dbt variables** — parameterize models via `dbt_project.yml` and `--vars` at runtime
-- **Advanced incremental models** — handle late-arriving data and partition strategies
-- **dbt packages** — deeper use of `dbt_utils` and community macros beyond `date_spine`
-- **Reusable macros** — extract repeated logic into project-wide macros
-- **Custom generic tests** — write reusable tests applicable across multiple models
+- Semi-structured event modeling
+- Variables in `dbt_project.yml`
+- Reusable macros
+- Incremental-style thinking for event data
+- Snapshotting slowly changing repository activity state
+- Custom tests that compare derived metrics back to source event patterns
 
----
+### 4. Leveling Up
 
-## Setup
+This phase rounds out core dbt project skills:
 
-### Prerequisites
-- Python 3.x
-- DuckDB CLI (optional — for browsing `target/dev.duckdb` directly)
+- Snapshots for slowly changing dimensions
+- Hooks
+- Exposures
+- Packages and community macros
+- Version control conventions
+- Critical model tests
+- Business logic documentation
+- Orchestration concepts across dbt Cloud and Airflow
 
-### Install
+## Useful Commands
+
+Install dependencies:
+
 ```bash
-pip install dbt-duckdb==1.10.0
-dbt deps  # install dbt_utils
+pip install dbt-duckdb
+dbt deps
 ```
 
-### Configure
-Create `profiles.yml` (gitignored — never committed):
-```yaml
-my_first_project:
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: target/dev.duckdb
-      schema: main
+Check the dbt connection:
+
+```bash
+dbt debug
 ```
 
-### Load source data (Project 1)
-Download the [Olist dataset from Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), place CSVs in `seeds/`, then:
+Load seed data:
+
 ```bash
 dbt seed
 ```
 
-### Run
-```bash
-dbt run          # full pipeline
-dbt test         # all tests
-dbt docs generate && dbt docs serve  # lineage + docs UI
+Run the full project:
 
-# Selective runs
+```bash
+dbt run
+dbt test
+```
+
+Run selected areas:
+
+```bash
 dbt run --select staging.*
 dbt run --select marts.*
-dbt run --select monthly_revenue
+dbt run --select +fact_orders
+dbt test --select stg_expenses
 ```
 
----
+Generate and serve documentation:
 
-## Overall Progress
-
-```
-Setup & Foundation          ██████████  100%  (14/14)
-E-Commerce Pipeline         █████████░   89%  (24/27)
-Personal Finance Tracker    ░░░░░░░░░░    0%  ( 0/12)
-Public Data Analysis        ░░░░░░░░░░    0%  ( 0/11)
-Leveling Up                 ░░░░░░░░░░    0%  ( 0/13)
-Bonus Challenges            ░░░░░░░░░░    0%  ( 0/5 )
-─────────────────────────────────────────────────────
-Overall                                  46%  (38/82)
+```bash
+dbt docs generate
+dbt docs serve
 ```
 
----
+Compile without executing:
 
-## Dataset Credits
+```bash
+dbt compile --select <model_name>
+```
 
-- **Project 1:** [Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — CC BY-NC-SA 4.0
+## Configuration Notes
+
+`dbt_project.yml` configures:
+
+- Staging models as views in the `staging` schema
+- Intermediate models as tables in the `intermediate` schema
+- Mart models as tables in the `marts` schema
+- E-commerce seeds in `raw_ecommerce`
+- Personal finance seeds in `raw_personal_finance`
+- GitHub analysis thresholds and event type variables
+
+The project also overrides dbt's default schema naming behavior through `macros/generate_schema_name.sql`, keeping schema names clean and predictable.
+
+## Learning Notes
+
+For someone coming from SQL and ETL tools, the biggest dbt shift in this repo is that model dependencies are declared in SQL through `ref()` and `source()`, then dbt builds the DAG from those references. In raw SQL or traditional ETL, execution order is often controlled outside the query. In dbt, the dependency graph is inferred from the model code itself.
+
+The other major shift is testing and documentation living beside the models. Schema YAML files are not just metadata; they are part of the project's quality contract.
+
+## References
+
+- dbt documentation: https://docs.getdbt.com/
+- dbt DuckDB adapter: https://github.com/duckdb/dbt-duckdb
+- DuckDB: https://duckdb.org/
+- dbt-utils package: https://hub.getdbt.com/dbt-labs/dbt_utils/latest/
+- Olist Brazilian E-Commerce dataset: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+- GitHub Archive: https://www.gharchive.org/
