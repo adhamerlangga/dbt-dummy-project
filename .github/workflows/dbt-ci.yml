@@ -43,15 +43,38 @@ jobs:
             - name: Load seed-backed raw sources
               run: dbt seed
 
-            - name: Verify GitHub raw source fixture
+            - name: Load GitHub raw source
               run: |
                 python <<'PY'
                 import duckdb
 
                 con = duckdb.connect("dev.duckdb")
-                print(con.sql("show schemas").fetchall())
-                print(con.sql("show tables from raw_github").fetchall())
+                con.sql("create schema if not exists raw_github")
+                con.sql("""
+                    create or replace table raw_github.github_events as
+                    select *
+                    from read_json_auto(
+                        'data/github_archive/*.json.gz',
+                        ignore_errors = true
+                    )
+                """)
+                print(con.sql("select count(*) from raw_github.github_events").fetchall())
+                con.close()
+                PY
+
+            - name: Verify GitHub raw source
+              run: |
+                python <<'PY'
+                import duckdb
+
+                con = duckdb.connect("dev.duckdb")
+                print(con.sql("""
+                    select table_schema, table_name
+                    from information_schema.tables
+                    where table_schema = 'raw_github'
+                """).fetchall())
                 print(con.sql("describe raw_github.github_events").fetchall())
+                con.close()
                 PY
 
             - name: Compile dbt project
