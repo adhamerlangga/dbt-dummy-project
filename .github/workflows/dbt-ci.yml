@@ -35,7 +35,7 @@ jobs:
                   outputs:
                     dev:
                       type: duckdb
-                      path: my_first_project.duckdb
+                      path: dev.duckdb
                       schema: main
                       threads: 4
                 EOF
