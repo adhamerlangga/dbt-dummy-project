@@ -43,6 +43,17 @@ jobs:
             - name: Load seed-backed raw sources
               run: dbt seed
 
+            - name: Verify GitHub raw source fixture
+              run: |
+                python <<'PY'
+                import duckdb
+
+                con = duckdb.connect("dev.duckdb")
+                print(con.sql("show schemas").fetchall())
+                print(con.sql("show tables from raw_github").fetchall())
+                print(con.sql("describe raw_github.github_events").fetchall())
+                PY
+
             - name: Compile dbt project
               run: dbt compile
             
